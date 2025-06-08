@@ -134,18 +134,23 @@ function generateUID() {
  */
 function resetDatabase() {
     if (confirm('Are you sure you want to reset the database? All cards will be permanently deleted.')) {
+        const statusEl = document.getElementById('db-status');
+        const createBtn = document.getElementById('create-db-btn');
+        const goToCardsBtn = document.getElementById('go-to-cards');
+        
         const request = indexedDB.deleteDatabase(DB_CONFIG.name);
         
         request.onerror = () => {
             console.error("Error deleting database:", request.error);
-            alert("Failed to reset database. Please try again.");
+            statusEl.textContent = 'Failed to reset database. Please try again.';
         };
         
         request.onsuccess = () => {
             console.log("Database deleted successfully");
-            alert("Database has been reset successfully.");
-            // Refresh the page to update the UI
-            window.location.reload();
+            statusEl.textContent = 'Database has been reset successfully. Click "Get Started" to create a new one.';
+            createBtn.classList.remove('hidden');
+            goToCardsBtn.classList.add('hidden');
         };
     }
 }
+
