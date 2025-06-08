@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mimir</title>    <style>
-        body {            margin: 0;
-            height: 100vh;            display: flex;
-            justify-content: center;            align-items: center;
-            font-family: Arial, sans-serif;            font-size: 2rem;
-        }    </style>
-</head><body>
-    <div>Hello Mimir, my old friend</div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mimir - Sign In</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Welcome to Mimir</h1>
+        <div id="auth-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Your password">
+            </div>
+            <button id="sign-in-btn">Sign In</button>
+            <button id="sign-up-btn">Sign Up</button>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
 </body>
 </html>
 
