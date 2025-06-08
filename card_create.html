@@ -4,11 +4,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mimir: Create Cards</title>
+        <script src="js/database.js" defer></script>
+        <script src="js/create.js" defer></script>
     </head>
     <body>
-        <form>
-            <input type="text" placeholder="prompt"/>
-            <input type="text" placeholder="response"/>
+        <form id="card-form">
+            <input type="text" id="card-prompt" placeholder="prompt" required/>
+            <input type="text" id="card-response" placeholder="response" required/>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2">Create Card</button>
         </form>
         <a href="review_cards.html">Review Cards</a>
