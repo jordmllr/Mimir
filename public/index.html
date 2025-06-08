@@ -5,8 +5,11 @@
   <title>Login</title>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <script src="https://unpkg.com/htmx.org@1.9.2" defer></script>
-  <script type="module" src="/supabaseClient.js"></script>
-  <script type="module" src="/login.js"></script>
+  <!-- Add Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Remove type="module" to avoid ES module issues -->
+  <script src="/supabaseClient.js"></script>
+  <script src="/login.js"></script>
 </head>
 <body class="p-4 font-sans">
   <form id="login-form" @submit.prevent="login($data)">
