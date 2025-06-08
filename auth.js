@@ -1,3 +1,5 @@
+import { createClient } from '@supabase/supabase-js';
+
 // Initialize Supabase client
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -94,3 +96,4 @@ signUpBtn.addEventListener('click', signUp);
 
 // Check if user is already signed in when page loads
 checkUser();
+
