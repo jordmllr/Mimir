@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mimir</title>    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css">    <meta name="theme-color" content="#ffffff">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Mimir">
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-</head><body>
-    <div class="container">        <h1>Mimir</h1>
-        <p>A minimalist spaced repetition flashcard app</p>        <button id="install-button">Get Mimir</button>
-    </div>    <script src="app.js"></script>
-</body>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mimir: Remember, Forever</title>
+        <script src="js/database.js" defer></script>
+    </head>
+    <body>
+        <h1>Mimir: Remember, Forever</h1>
+        <div id="status-container">
+            <p id="db-status">Checking database status...</p>
+            <div id="action-container" class="hidden">
+                <button id="create-db-btn">Get Started</button>
+                <a id="go-to-cards" href="card_create.html" class="hidden">Create Cards</a>
+                <button id="reset_db_btn" class="hidden">Reset Database</button>
+            </div>
+        </div>
+    </body>
 </html>
