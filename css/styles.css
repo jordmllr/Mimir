@@ -235,10 +235,22 @@ form {
     display: inline-block;
     border-radius: 4px;
     transition: background-color 0.3s;
+    /* iOS-specific touch improvements */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
 }
 
 .nav-link:hover {
     background-color: rgba(214, 179, 0, 0.1);
+}
+
+.nav-link:active {
+    background-color: rgba(214, 179, 0, 0.3);
+    transform: scale(0.98);
 }
 
 /* Tags input styling */

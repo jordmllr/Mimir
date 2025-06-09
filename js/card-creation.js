@@ -18,6 +18,7 @@ function cardCreation() {
             console.log('Card creation component initialized');
             await this.initDatabase();
             this.initSwipeDetection();
+            this.initNavigationHandling();
         },
 
         // Initialize IndexedDB
@@ -58,6 +59,17 @@ function cardCreation() {
             } else {
                 console.warn('SwipeDetector not available or container not found');
             }
+        },
+
+        // Initialize navigation handling for iOS compatibility
+        initNavigationHandling() {
+            // The global iOS navigation fix in user_interactions.js handles this
+            // Just ensure it runs after Alpine.js initialization
+            setTimeout(() => {
+                if (typeof initIOSNavigationFix === 'function') {
+                    initIOSNavigationFix();
+                }
+            }, 100);
         },
 
         // Open IndexedDB connection

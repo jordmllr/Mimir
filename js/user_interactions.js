@@ -202,22 +202,31 @@ class SwipeDetector {
         }
     }
 
-    // Helper method to check if an element is a form element that should not be interfered with
+    // Helper method to check if an element is a form element or navigation element that should not be interfered with
     isFormElement(element) {
         if (!element) return false;
 
         const formTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
+        const navigationTags = ['A']; // Add anchor tags for navigation
         const tagName = element.tagName;
 
-        // Check if it's a form element
-        if (formTags.includes(tagName)) {
+        // Check if it's a form element or navigation element
+        if (formTags.includes(tagName) || navigationTags.includes(tagName)) {
             return true;
         }
 
-        // Check if it's inside a form element (for labels, etc.)
+        // Check if it has navigation-related classes
+        if (element.classList && (element.classList.contains('nav-link') || element.classList.contains('navigation'))) {
+            return true;
+        }
+
+        // Check if it's inside a form element or navigation element
         let parent = element.parentElement;
         while (parent) {
-            if (formTags.includes(parent.tagName)) {
+            if (formTags.includes(parent.tagName) || navigationTags.includes(parent.tagName)) {
+                return true;
+            }
+            if (parent.classList && (parent.classList.contains('nav-link') || parent.classList.contains('navigation'))) {
                 return true;
             }
             parent = parent.parentElement;
@@ -279,4 +288,77 @@ class SwipeDetector {
 // Utility function to create swipe detector
 function createSwipeDetector(element, options = {}) {
     return new SwipeDetector(element, options);
+}
+
+// iOS Navigation Fix - Utility function to ensure navigation works on iOS
+function initIOSNavigationFix() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    console.log('Initializing iOS navigation fix - iOS detected:', isIOS);
+    console.log('User agent:', navigator.userAgent);
+
+    // Find all navigation links
+    const navLinks = document.querySelectorAll('.nav-link, a[href]');
+    console.log('Found navigation links:', navLinks.length);
+
+    navLinks.forEach((link, index) => {
+        // Skip if already processed
+        if (link.dataset.iosFixed) return;
+        link.dataset.iosFixed = 'true';
+
+        console.log(`Setting up navigation fix for link ${index}:`, link.href || link.textContent);
+
+        // For iOS, use a more aggressive approach
+        if (isIOS) {
+            // Add multiple event handlers to ensure navigation works
+            link.addEventListener('touchstart', function(e) {
+                console.log('iOS touch start on navigation link:', this.href);
+                this.style.backgroundColor = 'rgba(214, 179, 0, 0.3)';
+                this.dataset.touchStarted = 'true';
+            }, { passive: true });
+
+            link.addEventListener('touchend', function(e) {
+                console.log('iOS touch end on navigation link:', this.href);
+                this.style.backgroundColor = '';
+
+                // Only navigate if this was a clean touch (not a swipe)
+                if (this.dataset.touchStarted === 'true' && this.href) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    console.log('iOS forcing navigation to:', this.href);
+                    // Use a longer delay for iOS
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 150);
+                }
+
+                this.dataset.touchStarted = 'false';
+            }, { passive: false });
+
+            // Also handle click as a fallback
+            link.addEventListener('click', function(e) {
+                console.log('iOS click on navigation link:', this.href);
+                if (this.href) {
+                    e.preventDefault();
+                    console.log('iOS click navigation to:', this.href);
+                    window.location.href = this.href;
+                }
+            }, { passive: false });
+        } else {
+            // For non-iOS, use simpler handling
+            link.addEventListener('click', function(e) {
+                console.log('Non-iOS click on navigation link:', this.href);
+                // Let default behavior happen
+            });
+        }
+    });
+}
+
+// Auto-initialize on DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initIOSNavigationFix);
+} else {
+    initIOSNavigationFix();
 }
