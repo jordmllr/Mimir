@@ -5,10 +5,53 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mimir: Remember, Forever</title>
         <link rel="stylesheet" href="css/styles.css">
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <script src="js/database.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <script src="js/database.js"></script>
+        <script src="js/user_interactions.js"></script>
     </head>
-    <body x-init="checkDatabase()">
-        <h1>Mimir: Remember, Forever</h1>
+    <body>
+        <!-- Card Creation Component -->
+        <div x-data="cardCreation()" x-init="init()" class="card-creation-container">
+            <h1>Create New Card</h1>
+
+            <form @submit.prevent="createCard()">
+                <div class="form-group">
+                    <label for="prompt">Prompt (Front of card):</label>
+                    <textarea
+                        id="prompt"
+                        x-model="cardData.prompt"
+                        placeholder="Enter the question or prompt..."
+                        required>
+                    </textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="response">Response (Back of card):</label>
+                    <textarea
+                        id="response"
+                        x-model="cardData.response"
+                        placeholder="Enter the answer or response..."
+                        required>
+                    </textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" :disabled="isLoading">
+                        <span x-show="!isLoading">Create Card</span>
+                        <span x-show="isLoading">Creating...</span>
+                    </button>
+                    <button type="button" @click="clearForm()" :disabled="isLoading">
+                        Clear
+                    </button>
+                </div>
+            </form>
+
+            <!-- Status Messages -->
+            <div x-show="message" class="message" :class="messageType">
+                <span x-text="message"></span>
+            </div>
+        </div>
+
+        <script src="js/card-creation.js"></script>
     </body>
 </html>

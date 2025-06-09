@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swipe Detection Test - Mimir</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .test-area {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            margin: 20px 0;
+            user-select: none;
+            touch-action: none;
+        }
+        
+        .card-demo {
+            width: 90%;
+            max-width: 400px;
+            height: 200px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 16px;
+            margin: 20px auto;
+            transition: transform 0.2s ease;
+            user-select: none;
+            touch-action: none;
+        }
+        
+        .card-demo.swipe-feedback {
+            transform: scale(0.95);
+        }
+        
+        .feedback {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .instructions {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .clear-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🃏 Mimir Swipe Detection Test</h1>
+    
+    <div class="instructions">
+        <h3>Test Instructions:</h3>
+        <ul>
+            <li><strong>Swipe Left/Right:</strong> Navigate between cards</li>
+            <li><strong>Swipe Up/Down:</strong> Different actions (e.g., mark as learned, difficult)</li>
+            <li><strong>Tap:</strong> Flip card or select</li>
+            <li><strong>Long Press:</strong> Show options menu</li>
+        </ul>
+        <p>Try these gestures on the areas below:</p>
+    </div>
+    
+    <div class="test-area" id="test-area">
+        <div>
+            <h3>🎯 Main Test Area</h3>
+            <p>Try swiping, tapping, or long pressing here</p>
+        </div>
+    </div>
+    
+    <div class="card-demo" id="card-demo">
+        <div>
+            <h4>📚 Flashcard Demo</h4>
+            <p>This simulates a flashcard</p>
+        </div>
+    </div>
+    
+    <button class="clear-btn" onclick="clearFeedback()">Clear Feedback</button>
+    
+    <div id="feedback-container"></div>
+    
+    <script src="js/user_interactions.js"></script>
+    <script>
+        // Get elements
+        const testArea = document.getElementById('test-area');
+        const cardDemo = document.getElementById('card-demo');
+        const feedbackContainer = document.getElementById('feedback-container');
+        
+        // Create feedback function
+        function addFeedback(message, data = {}) {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.innerHTML = `
+                <strong>${message}</strong><br>
+                ${Object.keys(data).length > 0 ? `Data: ${JSON.stringify(data, null, 2)}` : ''}
+            `;
+            feedbackContainer.appendChild(feedback);
+            feedbackContainer.scrollTop = feedbackContainer.scrollHeight;
+        }
+        
+        // Clear feedback function
+        function clearFeedback() {
+            feedbackContainer.innerHTML = '';
+        }
+        
+        // Setup swipe detection for test area
+        const testAreaSwipe = createSwipeDetector(testArea, {
+            threshold: 50,
+            allowedTime: 300,
+            longPressDelay: 500
+        });
+        
+        testAreaSwipe
+            .onSwipeLeft((data) => {
+                addFeedback('⬅️ Swipe Left detected!', data);
+            })
+            .onSwipeRight((data) => {
+                addFeedback('➡️ Swipe Right detected!', data);
+            })
+            .onSwipeUp((data) => {
+                addFeedback('⬆️ Swipe Up detected!', data);
+            })
+            .onSwipeDown((data) => {
+                addFeedback('⬇️ Swipe Down detected!', data);
+            })
+            .onTap((data) => {
+                addFeedback('👆 Tap detected!', data);
+            })
+            .onLongPress((data) => {
+                addFeedback('👆⏰ Long Press detected!', data);
+            });
+        
+        // Setup swipe detection for card demo
+        const cardSwipe = createSwipeDetector(cardDemo, {
+            threshold: 30, // More sensitive for cards
+            allowedTime: 400,
+            longPressDelay: 600
+        });
+        
+        cardSwipe
+            .onSwipeLeft((data) => {
+                addFeedback('🃏⬅️ Card: Next card (swipe left)', data);
+                cardDemo.style.transform = 'translateX(-10px)';
+                setTimeout(() => cardDemo.style.transform = '', 200);
+            })
+            .onSwipeRight((data) => {
+                addFeedback('🃏➡️ Card: Previous card (swipe right)', data);
+                cardDemo.style.transform = 'translateX(10px)';
+                setTimeout(() => cardDemo.style.transform = '', 200);
+            })
+            .onSwipeUp((data) => {
+                addFeedback('🃏⬆️ Card: Mark as learned (swipe up)', data);
+                cardDemo.style.background = '#4CAF50';
+                setTimeout(() => cardDemo.style.background = 'white', 500);
+            })
+            .onSwipeDown((data) => {
+                addFeedback('🃏⬇️ Card: Mark as difficult (swipe down)', data);
+                cardDemo.style.background = '#FF5722';
+                setTimeout(() => cardDemo.style.background = 'white', 500);
+            })
+            .onTap((data) => {
+                addFeedback('🃏👆 Card: Flip card (tap)', data);
+                cardDemo.classList.add('swipe-feedback');
+                setTimeout(() => cardDemo.classList.remove('swipe-feedback'), 200);
+            })
+            .onLongPress((data) => {
+                addFeedback('🃏👆⏰ Card: Show options menu (long press)', data);
+                cardDemo.style.boxShadow = '0 8px 25px rgba(0,0,0,0.4)';
+                setTimeout(() => cardDemo.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)', 500);
+            });
+        
+        // Initial feedback
+        addFeedback('🚀 Swipe detection system initialized!');
+        addFeedback('📱 Try different gestures on the areas above');
+    </script>
+</body>
+</html>

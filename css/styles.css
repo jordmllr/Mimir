@@ -1,7 +1,117 @@
 body {
     background-color: #001336;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
 }
 
 h1 {
     color: #d6b300;
+}
+
+/* Card Creation Component Styles */
+.card-creation-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    touch-action: pan-y; /* Allow vertical scrolling but enable horizontal swipes */
+}
+
+/* Swipe instruction hint */
+.card-creation-container::before {
+    content: "💡 Swipe right to save • Swipe left to clear";
+    display: block;
+    text-align: center;
+    color: #d6b300;
+    font-size: 14px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #d6b300;
+    font-weight: bold;
+}
+
+.form-group textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 2px solid #d6b300;
+    border-radius: 5px;
+    background-color: #002147;
+    color: #ffffff;
+    font-size: 16px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #ffcc00;
+    box-shadow: 0 0 5px rgba(214, 179, 0, 0.5);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #d6b300;
+    color: #001336;
+    font-weight: bold;
+}
+
+.form-actions button[type="submit"]:hover:not(:disabled) {
+    background-color: #ffcc00;
+}
+
+.form-actions button[type="button"] {
+    background-color: #666;
+    color: white;
+}
+
+.form-actions button[type="button"]:hover:not(:disabled) {
+    background-color: #888;
+}
+
+.form-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Message styles */
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.message.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.message.error {
+    background-color: #f44336;
+    color: white;
 }
