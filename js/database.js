@@ -15,7 +15,8 @@ const DB_CONFIG = {
 
 // Alpine.js component for the main app
 function mimirApp() {
-    return {
+    console.log('mimirApp function called');
+    const appData = {
         dbExists: false,
         dbStatus: 'Checking database status...',
         showActions: false,
@@ -50,8 +51,10 @@ function mimirApp() {
         },
 
         showNoDatabaseUI() {
+            console.log('showNoDatabaseUI called');
             this.showActions = true;
             this.dbExists = false;
+            console.log('State after showNoDatabaseUI:', { showActions: this.showActions, dbExists: this.dbExists });
         },
 
         showDatabaseExistsUI() {
@@ -100,7 +103,10 @@ function mimirApp() {
                 };
             }
         }
-    }
+    };
+
+    console.log('Returning appData:', appData);
+    return appData;
 }
 
 /**
@@ -141,3 +147,7 @@ function addCard(card) {
 function generateUID() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
+
+// Test that the function is defined
+console.log('mimirApp function defined:', typeof mimirApp);
+window.mimirApp = mimirApp; // Make it globally available for debugging
