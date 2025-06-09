@@ -12,9 +12,12 @@
         <h1>Mimir: Remember, Forever</h1>
         <div id="status-container">
             <p x-text="dbStatus">Checking database status...</p>
-            <div x-show="showActions">
-                <button x-show="!dbExists" @click="initializeDatabase()">Get Started</button>
-                <button x-show="dbExists" @click="resetDatabase()">Reset Database</button>
+            <div x-show="isLoading" class="loading">
+                <p>⏳ Please wait...</p>
+            </div>
+            <div x-show="showActions && !isLoading">
+                <button x-show="!dbExists" @click="initializeDatabase()" :disabled="isLoading">Get Started</button>
+                <button x-show="dbExists" @click="resetDatabase()" :disabled="isLoading">Reset Database</button>
             </div>
         </div>
         <navigation x-show="dbExists">

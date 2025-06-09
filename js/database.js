@@ -20,6 +20,7 @@ function mimirApp() {
         dbExists: false,
         dbStatus: 'Checking database status...',
         showActions: false,
+        isLoading: false,
 
         checkDatabase() {
             const request = indexedDB.open(DB_CONFIG.name);
@@ -63,10 +64,15 @@ function mimirApp() {
         },
 
         initializeDatabase() {
+            this.isLoading = true;
+            this.dbStatus = 'Creating database...';
+
             const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
 
             request.onerror = () => {
                 console.error("Database error:", request.error);
+                this.isLoading = false;
+                this.dbStatus = 'Failed to create database. Please try again.';
             };
 
             request.onupgradeneeded = (event) => {
@@ -82,6 +88,7 @@ function mimirApp() {
             };
 
             request.onsuccess = () => {
+                this.isLoading = false;
                 this.dbStatus = 'Database created successfully!';
                 this.showDatabaseExistsUI();
             };
@@ -89,15 +96,20 @@ function mimirApp() {
 
         resetDatabase() {
             if (confirm('Are you sure you want to reset the database? All cards will be permanently deleted.')) {
+                this.isLoading = true;
+                this.dbStatus = 'Resetting database...';
+
                 const request = indexedDB.deleteDatabase(DB_CONFIG.name);
 
                 request.onerror = () => {
                     console.error("Error deleting database:", request.error);
+                    this.isLoading = false;
                     this.dbStatus = 'Failed to reset database. Please try again.';
                 };
 
                 request.onsuccess = () => {
                     console.log("Database deleted successfully");
+                    this.isLoading = false;
                     this.dbStatus = 'Database has been reset successfully. Click "Get Started" to create a new one.';
                     this.showNoDatabaseUI();
                 };
