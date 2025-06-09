@@ -13,6 +13,7 @@ function cardCreation() {
         db: null,
         swipeDetector: null,
         totalCards: 0,
+        lastSwipeTime: 0, // Track last swipe to prevent rapid successive swipes
 
         // Initialize component
         async init() {
@@ -101,8 +102,16 @@ function cardCreation() {
         },
 
         // Create a new card
-        async createCard() {
+        async createCard(source = 'form') {
+            console.log('createCard called from:', source);
+
             if (!this.validateForm()) {
+                return;
+            }
+
+            // Prevent duplicate submissions
+            if (this.isLoading) {
+                console.log('Card creation already in progress, ignoring duplicate request from:', source);
                 return;
             }
 
@@ -121,13 +130,16 @@ function cardCreation() {
                     last_reviewed: null
                 };
 
+                console.log('Attempting to save card:', card.card_id);
                 await this.saveCardToDatabase(card);
+                console.log('Card saved successfully:', card.card_id);
+
                 await this.loadCardCount(); // Update card count after creating a card
                 this.showMessage('Card created successfully!', 'success');
                 this.clearForm();
                 this.dismissKeyboard(); // Hide keyboard after successful save
 
-                console.log('Card created:', card);
+                console.log('Card creation process completed for:', card.card_id);
             } catch (error) {
                 console.error('Failed to create card:', error);
                 this.showMessage('Failed to create card. Please try again.', 'error');
@@ -139,12 +151,31 @@ function cardCreation() {
         // Save card to IndexedDB
         saveCardToDatabase(card) {
             return new Promise((resolve, reject) => {
+                console.log('Starting database transaction for card:', card.card_id);
+
                 const transaction = this.db.transaction(['cards'], 'readwrite');
                 const store = transaction.objectStore('cards');
+
+                transaction.oncomplete = () => {
+                    console.log('Database transaction completed for card:', card.card_id);
+                };
+
+                transaction.onerror = (event) => {
+                    console.error('Database transaction failed for card:', card.card_id, event);
+                    reject(event.target.error);
+                };
+
                 const request = store.add(card);
 
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    console.log('Card successfully added to database:', card.card_id);
+                    resolve(request.result);
+                };
+
+                request.onerror = () => {
+                    console.error('Failed to add card to database:', card.card_id, request.error);
+                    reject(request.error);
+                };
             });
         },
 
@@ -216,8 +247,17 @@ function cardCreation() {
 
         // Handle swipe right (save card)
         async handleSwipeSave() {
+            // Prevent rapid successive swipes (debounce)
+            const now = Date.now();
+            if (now - this.lastSwipeTime < 1000) { // 1 second debounce
+                console.log('Swipe ignored - too soon after last swipe');
+                return;
+            }
+            this.lastSwipeTime = now;
+
             // Only save if form has content and we're not already loading
             if (this.isLoading) {
+                console.log('Swipe ignored - already loading');
                 return;
             }
 
@@ -231,7 +271,7 @@ function cardCreation() {
 
             // Small delay to show the swipe feedback message
             setTimeout(() => {
-                this.createCard();
+                this.createCard('swipe');
             }, 500);
         },
 
