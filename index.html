@@ -5,25 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mimir: Remember, Forever</title>
         <link rel="stylesheet" href="css/styles.css">
-        <script src="js/database.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script src="js/database.js" defer></script>
     </head>
-    <body x-data="mimirApp()" x-init="checkDatabase()">
+    <body x-init="checkDatabase()">
         <h1>Mimir: Remember, Forever</h1>
-        <div id="status-container">
-            <p x-text="dbStatus">Checking database status...</p>
-            <div x-show="isLoading" class="loading">
-                <p>⏳ Please wait...</p>
-            </div>
-            <div x-show="showActions && !isLoading">
-                <button x-show="!dbExists" @click="initializeDatabase()" :disabled="isLoading">Get Started</button>
-                <button x-show="dbExists" @click="resetDatabase()" :disabled="isLoading">Reset Database</button>
-            </div>
-        </div>
-        <navigation x-show="dbExists">
-            <a href="card_create.html">Create Cards</a>
-            <a href="manage_cards.html">Manage Cards</a>
-            <a href="review_cards.html">Review Cards</a>
-        </navigation>
     </body>
 </html>
