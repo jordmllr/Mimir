@@ -108,6 +108,7 @@ function cardCreation() {
                 await this.saveCardToDatabase(card);
                 this.showMessage('Card created successfully!', 'success');
                 this.clearForm();
+                this.dismissKeyboard(); // Hide keyboard after successful save
 
                 console.log('Card created:', card);
             } catch (error) {
@@ -150,6 +151,13 @@ function cardCreation() {
             this.cardData.prompt = '';
             this.cardData.response = '';
             this.clearMessage();
+        },
+
+        // Dismiss keyboard by removing focus from active element
+        dismissKeyboard() {
+            if (document.activeElement && document.activeElement.blur) {
+                document.activeElement.blur();
+            }
         },
 
         // Handle swipe right (save card)
