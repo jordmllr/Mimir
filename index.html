@@ -12,42 +12,25 @@
     <body>
         <!-- Card Creation Component -->
         <div x-data="cardCreation()" x-init="init()" class="card-creation-container">
-            <h1>Create New Card</h1>
-
-            <!-- Swipe area indicator -->
-            <div class="swipe-area-hint">
-                Swipe here: ← Clear | Save →
-            </div>
-
             <form @submit.prevent="createCard()">
                 <div class="form-group">
-                    <label for="prompt">Prompt (Front of card):</label>
+                    <!-- <label for="prompt">Prompt (Front of card):</label> -->
                     <textarea
                         id="prompt"
                         x-model="cardData.prompt"
-                        placeholder="Enter the question or prompt..."
+                        placeholder="prompt..."
                         required>
                     </textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="response">Response (Back of card):</label>
+                    <!-- <label for="response">Response (Back of card):</label> -->
                     <textarea
                         id="response"
                         x-model="cardData.response"
-                        placeholder="Enter the answer or response..."
+                        placeholder="response..."
                         required>
                     </textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" :disabled="isLoading">
-                        <span x-show="!isLoading">Create Card</span>
-                        <span x-show="isLoading">Creating...</span>
-                    </button>
-                    <button type="button" @click="clearForm()" :disabled="isLoading">
-                        Clear
-                    </button>
                 </div>
             </form>
 
