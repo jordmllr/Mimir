@@ -4,18 +4,20 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mimir: Remember, Forever</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script src="js/database.js" defer></script>
     </head>
-    <body>
+    <body x-data="mimirApp()" x-init="checkDatabase()" x-cloak>
         <h1>Mimir: Remember, Forever</h1>
         <div id="status-container">
-            <p id="db-status">Checking database status...</p>
-            <div id="db-action-container" class="hidden">
-                <button id="create-db-btn">Get Started</button>
-                <button id="reset-db-btn">Reset Database</button>
+            <p x-text="dbStatus">Checking database status...</p>
+            <div x-show="showActions">
+                <button x-show="!dbExists" @click="initializeDatabase()">Get Started</button>
+                <button x-show="dbExists" @click="resetDatabase()">Reset Database</button>
             </div>
         </div>
-        <navigation hidden>
+        <navigation x-show="dbExists">
             <a href="card_create.html">Create Cards</a>
             <a href="manage_cards.html">Manage Cards</a>
             <a href="review_cards.html">Review Cards</a>
