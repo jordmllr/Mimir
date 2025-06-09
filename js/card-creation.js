@@ -12,11 +12,13 @@ function cardCreation() {
         messageType: 'success', // 'success' or 'error'
         db: null,
         swipeDetector: null,
+        totalCards: 0,
 
         // Initialize component
         async init() {
             console.log('Card creation component initialized');
             await this.initDatabase();
+            await this.loadCardCount();
             this.initSwipeDetection();
             this.initNavigationHandling();
         },
@@ -120,6 +122,7 @@ function cardCreation() {
                 };
 
                 await this.saveCardToDatabase(card);
+                await this.loadCardCount(); // Update card count after creating a card
                 this.showMessage('Card created successfully!', 'success');
                 this.clearForm();
                 this.dismissKeyboard(); // Hide keyboard after successful save
@@ -139,6 +142,29 @@ function cardCreation() {
                 const transaction = this.db.transaction(['cards'], 'readwrite');
                 const store = transaction.objectStore('cards');
                 const request = store.add(card);
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        },
+
+        // Load total card count
+        async loadCardCount() {
+            try {
+                this.totalCards = await this.getCardCount();
+                console.log('Total cards:', this.totalCards);
+            } catch (error) {
+                console.error('Failed to load card count:', error);
+                this.totalCards = 0;
+            }
+        },
+
+        // Get card count from IndexedDB
+        getCardCount() {
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(['cards'], 'readonly');
+                const store = transaction.objectStore('cards');
+                const request = store.count();
 
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error);

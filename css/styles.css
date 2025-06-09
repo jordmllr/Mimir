@@ -11,6 +11,24 @@ h1 {
     color: #d6b300;
 }
 
+/* Card Count Display */
+.card-count-display {
+    background-color: rgba(214, 179, 0, 0.1);
+    border: 1px solid #d6b300;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #d6b300;
+    font-size: 16px;
+}
+
+.count-number {
+    font-weight: bold;
+    font-size: 18px;
+    color: #ffcc00;
+}
+
 /* Card Creation Component Styles */
 .card-creation-container {
     max-width: 600px;

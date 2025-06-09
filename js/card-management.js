@@ -10,6 +10,7 @@ function cardManagement() {
         message: '',
         messageType: 'success',
         db: null,
+        totalCards: 0,
 
         // Edit modal data
         editingCard: null,
@@ -63,7 +64,7 @@ function cardManagement() {
                         // Handle schema updates for existing database
                         const transaction = event.target.transaction;
                         const store = transaction.objectStore('cards');
-                        
+
                         // Add tags index if it doesn't exist
                         if (!store.indexNames.contains('tags')) {
                             store.createIndex('tags', 'tags', { unique: false });
@@ -78,6 +79,7 @@ function cardManagement() {
             try {
                 this.isLoading = true;
                 this.cards = await this.getAllCards();
+                this.totalCards = this.cards.length;
                 console.log('Loaded cards:', this.cards);
             } catch (error) {
                 console.error('Failed to load cards:', error);
@@ -109,7 +111,7 @@ function cardManagement() {
         // Build deck list from cards
         buildDecks() {
             const deckMap = new Map();
-            
+
             // Count cards without tags
             const untaggedCount = this.cards.filter(card => !card.tags || card.tags.length === 0).length;
             if (untaggedCount > 0) {
@@ -141,11 +143,11 @@ function cardManagement() {
         // Select a deck and filter cards
         selectDeck(deckName) {
             this.selectedDeck = deckName;
-            
+
             if (deckName === 'None') {
                 this.filteredCards = this.cards.filter(card => !card.tags || card.tags.length === 0);
             } else {
-                this.filteredCards = this.cards.filter(card => 
+                this.filteredCards = this.cards.filter(card =>
                     card.tags && card.tags.includes(deckName)
                 );
             }
@@ -175,7 +177,7 @@ function cardManagement() {
                 };
 
                 await this.updateCardInDatabase(updatedCard);
-                
+
                 // Update local data
                 const index = this.cards.findIndex(c => c.card_id === updatedCard.card_id);
                 if (index !== -1) {
@@ -209,11 +211,12 @@ function cardManagement() {
 
             try {
                 await this.deleteCardFromDatabase(cardId);
-                
+
                 // Update local data
                 this.cards = this.cards.filter(c => c.card_id !== cardId);
+                this.totalCards = this.cards.length;
                 this.buildDecks();
-                
+
                 if (this.selectedDeck) {
                     this.selectDeck(this.selectedDeck);
                 }
@@ -254,7 +257,7 @@ function cardManagement() {
             if (!tagsString || !tagsString.trim()) {
                 return [];
             }
-            
+
             return tagsString
                 .split(',')
                 .map(tag => tag.trim())

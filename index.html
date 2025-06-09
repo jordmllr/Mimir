@@ -12,6 +12,11 @@
     <body>
         <!-- Card Creation Component -->
         <div x-data="cardCreation()" x-init="init()" class="card-creation-container">
+            <!-- Card Count Display -->
+            <div class="card-count-display">
+                <span>Total Cards: </span>
+                <span x-text="totalCards" class="count-number"></span>
+            </div>
             <form @submit.prevent="createCard()">
                 <div class="form-group">
                     <!-- <label for="prompt">Prompt (Front of card):</label> -->

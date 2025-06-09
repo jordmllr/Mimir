@@ -1,7 +1,7 @@
 // Database configuration
 const DB_CONFIG = {
     name: 'mimirDB',
-    isDevelopment: true,
+    isDevelopment: false, // Set to false to persist cards between page loads
     version: 2, // Incremented for schema changes
     stores: {
         cards: {

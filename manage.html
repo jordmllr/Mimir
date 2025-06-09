@@ -14,6 +14,12 @@
         <div x-data="cardManagement()" x-init="init()" class="card-management-container">
             <h1>Manage Cards</h1>
 
+            <!-- Card Count Display -->
+            <div class="card-count-display">
+                <span>Total Cards: </span>
+                <span x-text="totalCards" class="count-number"></span>
+            </div>
+
             <!-- Loading State -->
             <div x-show="isLoading" class="loading">
                 <span>Loading cards...</span>
@@ -24,8 +30,8 @@
                 <h2>Decks</h2>
                 <div class="deck-list">
                     <template x-for="deck in decks" :key="deck.name">
-                        <div 
-                            class="deck-item" 
+                        <div
+                            class="deck-item"
                             :class="{ 'active': selectedDeck === deck.name }"
                             @click="selectDeck(deck.name)"
                         >
@@ -40,7 +46,7 @@
             <div x-show="!isLoading && selectedDeck" class="cards-section">
                 <hr class="divider">
                 <h3>Cards in <span x-text="selectedDeck"></span></h3>
-                
+
                 <div x-show="filteredCards.length === 0" class="no-cards">
                     <p>No cards in this deck.</p>
                 </div>
@@ -56,7 +62,7 @@
                                     <strong>Response:</strong> <span x-text="card.response"></span>
                                 </div>
                                 <div class="card-tags" x-show="card.tags && card.tags.length > 0">
-                                    <strong>Tags:</strong> 
+                                    <strong>Tags:</strong>
                                     <template x-for="tag in card.tags" :key="tag">
                                         <span class="tag" x-text="tag"></span>
                                     </template>
