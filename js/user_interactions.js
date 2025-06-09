@@ -50,8 +50,16 @@ class SwipeDetector {
 
     handleTouchStart(e) {
         const touch = e.touches[0];
+        const target = e.target;
+
+        // Don't interfere with form elements and buttons
+        if (this.isFormElement(target)) {
+            return;
+        }
+
         this.startTracking(touch.clientX, touch.clientY);
-        e.preventDefault(); // Prevent scrolling
+        // Only prevent default if we're starting to track a swipe
+        e.preventDefault();
     }
 
     handleTouchMove(e) {
@@ -60,7 +68,7 @@ class SwipeDetector {
         // Clear long press timer on movement
         this.clearLongPressTimer();
 
-        // Prevent scrolling during swipe
+        // Only prevent scrolling during active swipe tracking
         e.preventDefault();
     }
 
@@ -72,6 +80,13 @@ class SwipeDetector {
     }
 
     handleMouseDown(e) {
+        const target = e.target;
+
+        // Don't interfere with form elements and buttons
+        if (this.isFormElement(target)) {
+            return;
+        }
+
         this.startTracking(e.clientX, e.clientY);
     }
 
@@ -185,6 +200,30 @@ class SwipeDetector {
             clearTimeout(this.longPressTimer);
             this.longPressTimer = null;
         }
+    }
+
+    // Helper method to check if an element is a form element that should not be interfered with
+    isFormElement(element) {
+        if (!element) return false;
+
+        const formTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
+        const tagName = element.tagName;
+
+        // Check if it's a form element
+        if (formTags.includes(tagName)) {
+            return true;
+        }
+
+        // Check if it's inside a form element (for labels, etc.)
+        let parent = element.parentElement;
+        while (parent) {
+            if (formTags.includes(parent.tagName)) {
+                return true;
+            }
+            parent = parent.parentElement;
+        }
+
+        return false;
     }
 
     triggerCallback(eventType, data) {

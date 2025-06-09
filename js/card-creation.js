@@ -34,34 +34,12 @@ function cardCreation() {
         initSwipeDetection() {
             const container = document.querySelector('.card-creation-container');
             if (container && typeof SwipeDetector !== 'undefined') {
-                // Create a custom swipe detector that ignores input elements
+                // Create swipe detector - it now automatically ignores form elements
                 this.swipeDetector = new SwipeDetector(container, {
                     threshold: 50,
                     restraint: 100,
                     allowedTime: 300
                 });
-
-                // Override the touch start handler to ignore input elements
-                const originalHandleTouchStart = this.swipeDetector.handleTouchStart.bind(this.swipeDetector);
-                this.swipeDetector.handleTouchStart = (e) => {
-                    // Check if the touch started on an input element
-                    const target = e.target;
-                    if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' || target.tagName === 'BUTTON') {
-                        return; // Don't handle swipes on input elements
-                    }
-                    originalHandleTouchStart(e);
-                };
-
-                // Override the mouse down handler to ignore input elements
-                const originalHandleMouseDown = this.swipeDetector.handleMouseDown.bind(this.swipeDetector);
-                this.swipeDetector.handleMouseDown = (e) => {
-                    // Check if the mouse down started on an input element
-                    const target = e.target;
-                    if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' || target.tagName === 'BUTTON') {
-                        return; // Don't handle swipes on input elements
-                    }
-                    originalHandleMouseDown(e);
-                };
 
                 // Swipe right to save card
                 this.swipeDetector.onSwipeRight(() => {

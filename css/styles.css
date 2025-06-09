@@ -46,7 +46,7 @@ h1 {
 .form-group textarea {
     width: 100%;
     min-height: 100px;
-    padding: 10px;
+    padding: 12px;
     border: 2px solid #d6b300;
     border-radius: 5px;
     background-color: #002147;
@@ -55,6 +55,9 @@ h1 {
     resize: vertical;
     box-sizing: border-box;
     touch-action: manipulation; /* Allow normal touch interactions on inputs */
+    -webkit-appearance: none; /* Remove iOS styling */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+    line-height: 1.4;
 }
 
 .form-group textarea:focus {
@@ -118,4 +121,39 @@ h1 {
 .message.error {
     background-color: #f44336;
     color: white;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .card-creation-container {
+        padding: 15px;
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+        padding: 15px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .form-actions button {
+        width: 100%;
+        padding: 15px 24px;
+        font-size: 18px;
+        min-height: 48px; /* Ensure touch target size */
+    }
+
+    .swipe-area-hint {
+        padding: 20px;
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
 }
