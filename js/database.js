@@ -28,7 +28,7 @@ function checkDatabase() {
     const request = indexedDB.open(DB_CONFIG.name);
     const statusEl = document.getElementById('db-status');
     const actionContainer = document.getElementById('action-container');
-    const createBtn = document.getElementById('create-db-btn');
+    const createDatabaseBtn = document.getElementById('create-db-btn');
     const goToCardsBtn = document.getElementById('go-to-cards');
     
     request.onerror = () => {
@@ -43,11 +43,10 @@ function checkDatabase() {
         if (!db.objectStoreNames.contains('cards')) {
             statusEl.textContent = 'Database exists but needs setup.';
             actionContainer.classList.remove('hidden');
-            createBtn.classList.remove('hidden');
+            createDatabaseBtn.classList.remove('hidden');
         } else {
             statusEl.textContent = 'Database ready!';
-            actionContainer.classList.remove('hidden');
-            createBtn.classList.add('hidden');
+            createDatabaseBtn.classList.add('hidden');
             goToCardsBtn.classList.remove('hidden');
         }
         db.close();
@@ -55,8 +54,6 @@ function checkDatabase() {
     
     request.onupgradeneeded = (event) => {
         statusEl.textContent = 'No database found. Click "Get Started" to create one.';
-        actionContainer.classList.remove('hidden');
-        createBtn.classList.remove('hidden');
         event.target.transaction.abort(); // Don't create DB yet
     };
 }
