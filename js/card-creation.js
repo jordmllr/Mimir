@@ -4,7 +4,8 @@ function cardCreation() {
         // Component data
         cardData: {
             prompt: '',
-            response: ''
+            response: '',
+            tags: ''
         },
         isLoading: false,
         message: '',
@@ -99,6 +100,7 @@ function cardCreation() {
                     card_id: this.generateCardId(),
                     prompt: this.cardData.prompt.trim(),
                     response: this.cardData.response.trim(),
+                    tags: this.parseTags(this.cardData.tags),
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                     review_count: 0,
@@ -150,7 +152,21 @@ function cardCreation() {
         clearForm() {
             this.cardData.prompt = '';
             this.cardData.response = '';
+            this.cardData.tags = '';
             this.clearMessage();
+        },
+
+        // Parse tags from string input
+        parseTags(tagsString) {
+            if (!tagsString || !tagsString.trim()) {
+                return [];
+            }
+
+            return tagsString
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag.length > 0)
+                .map(tag => tag.toLowerCase()); // Normalize to lowercase
         },
 
         // Dismiss keyboard by removing focus from active element

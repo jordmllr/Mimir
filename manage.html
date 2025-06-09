@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mimir: Manage Cards</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <script src="js/database.js"></script>
+        <script src="js/user_interactions.js"></script>
+    </head>
+    <body>
+        <!-- Card Management Component -->
+        <div x-data="cardManagement()" x-init="init()" class="card-management-container">
+            <h1>Manage Cards</h1>
+
+            <!-- Loading State -->
+            <div x-show="isLoading" class="loading">
+                <span>Loading cards...</span>
+            </div>
+
+            <!-- Deck Selection -->
+            <div x-show="!isLoading" class="deck-selection">
+                <h2>Decks</h2>
+                <div class="deck-list">
+                    <template x-for="deck in decks" :key="deck.name">
+                        <div 
+                            class="deck-item" 
+                            :class="{ 'active': selectedDeck === deck.name }"
+                            @click="selectDeck(deck.name)"
+                        >
+                            <span class="deck-name" x-text="deck.name"></span>
+                            <span class="deck-count" x-text="`(${deck.count})`"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Cards in Selected Deck -->
+            <div x-show="!isLoading && selectedDeck" class="cards-section">
+                <hr class="divider">
+                <h3>Cards in <span x-text="selectedDeck"></span></h3>
+                
+                <div x-show="filteredCards.length === 0" class="no-cards">
+                    <p>No cards in this deck.</p>
+                </div>
+
+                <div class="cards-list">
+                    <template x-for="card in filteredCards" :key="card.card_id">
+                        <div class="card-item">
+                            <div class="card-content">
+                                <div class="card-prompt">
+                                    <strong>Prompt:</strong> <span x-text="card.prompt"></span>
+                                </div>
+                                <div class="card-response">
+                                    <strong>Response:</strong> <span x-text="card.response"></span>
+                                </div>
+                                <div class="card-tags" x-show="card.tags && card.tags.length > 0">
+                                    <strong>Tags:</strong> 
+                                    <template x-for="tag in card.tags" :key="tag">
+                                        <span class="tag" x-text="tag"></span>
+                                    </template>
+                                </div>
+                                <div class="card-meta">
+                                    <small>Created: <span x-text="formatDate(card.created_at)"></span></small>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button @click="editCard(card)" class="edit-btn">Edit</button>
+                                <button @click="deleteCard(card.card_id)" class="delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Edit Card Modal -->
+            <div x-show="editingCard" class="modal-overlay" @click.self="cancelEdit()">
+                <div class="modal">
+                    <h3>Edit Card</h3>
+                    <form @submit.prevent="saveEdit()">
+                        <div class="form-group">
+                            <label for="edit-prompt">Prompt:</label>
+                            <textarea
+                                id="edit-prompt"
+                                x-model="editData.prompt"
+                                required>
+                            </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-response">Response:</label>
+                            <textarea
+                                id="edit-response"
+                                x-model="editData.response"
+                                required>
+                            </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-tags">Tags (comma-separated):</label>
+                            <input
+                                type="text"
+                                id="edit-tags"
+                                x-model="editData.tags"
+                                placeholder="tag1, tag2, tag3"
+                            />
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="save-btn">Save</button>
+                            <button type="button" @click="cancelEdit()" class="cancel-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div x-show="message" class="message" :class="messageType">
+                <span x-text="message"></span>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <hr class="divider">
+                <a href="index.html" class="nav-link">Create Cards</a>
+            </div>
+        </div>
+
+        <script src="js/card-management.js"></script>
+    </body>
+</html>

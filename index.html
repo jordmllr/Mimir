@@ -32,11 +32,27 @@
                         required>
                     </textarea>
                 </div>
+
+                <div class="form-group">
+                    <!-- <label for="tags">Tags (comma-separated):</label> -->
+                    <input
+                        type="text"
+                        id="tags"
+                        x-model="cardData.tags"
+                        placeholder="tags (comma-separated)..."
+                    />
+                </div>
             </form>
 
             <!-- Status Messages -->
             <div x-show="message" class="message" :class="messageType">
                 <span x-text="message"></span>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <hr class="divider">
+                <a href="manage.html" class="nav-link">Manage Cards</a>
             </div>
         </div>
 

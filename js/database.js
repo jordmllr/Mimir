@@ -2,13 +2,14 @@
 const DB_CONFIG = {
     name: 'mimirDB',
     isDevelopment: true,
-    version: 1,
+    version: 2, // Incremented for schema changes
     stores: {
         cards: {
             keyPath: 'card_id',
             indexes: [
                 { name: 'prompt', unique: false },
-                { name: 'response', unique: false }
+                { name: 'response', unique: false },
+                { name: 'tags', unique: false }
             ]
         }
     }

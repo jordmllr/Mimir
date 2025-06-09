@@ -193,3 +193,342 @@ form {
         margin-bottom: 25px;
     }
 }
+
+/* Navigation styles */
+.navigation {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.divider {
+    border: none;
+    height: 1px;
+    background-color: #444;
+    margin: 20px 0;
+}
+
+.nav-link {
+    color: #d6b300;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: inline-block;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: rgba(214, 179, 0, 0.1);
+}
+
+/* Tags input styling */
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #002147;
+    color: #ffffff;
+    font-size: 16px;
+    box-sizing: border-box;
+    min-height: 50px;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(214, 179, 0, 0.3);
+}
+
+/* Card Management Styles */
+.card-management-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #ffffff;
+}
+
+.loading {
+    text-align: center;
+    color: #d6b300;
+    font-size: 18px;
+    padding: 40px;
+}
+
+/* Deck Selection */
+.deck-selection h2 {
+    color: #d6b300;
+    margin-bottom: 15px;
+}
+
+.deck-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.deck-item {
+    background-color: #002147;
+    padding: 12px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.deck-item:hover {
+    background-color: #003366;
+}
+
+.deck-item.active {
+    background-color: #d6b300;
+    color: #001336;
+}
+
+.deck-name {
+    font-weight: bold;
+}
+
+.deck-count {
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+/* Cards Section */
+.cards-section h3 {
+    color: #d6b300;
+    margin: 20px 0 15px 0;
+}
+
+.no-cards {
+    text-align: center;
+    color: #888;
+    padding: 40px;
+    font-style: italic;
+}
+
+.cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card-item {
+    background-color: #002147;
+    border-radius: 5px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-prompt, .card-response {
+    margin-bottom: 8px;
+}
+
+.card-prompt strong, .card-response strong {
+    color: #d6b300;
+}
+
+.card-tags {
+    margin-bottom: 8px;
+}
+
+.card-tags strong {
+    color: #d6b300;
+}
+
+.tag {
+    background-color: #d6b300;
+    color: #001336;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.card-meta {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.edit-btn, .delete-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+}
+
+.edit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #45a049;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #da190b;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal {
+    background-color: #001336;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal h3 {
+    color: #d6b300;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.modal .form-group {
+    margin-bottom: 15px;
+}
+
+.modal .form-group label {
+    display: block;
+    color: #d6b300;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.modal textarea, .modal input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #002147;
+    color: #ffffff;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-btn, .cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.save-btn {
+    background-color: #d6b300;
+    color: #001336;
+    font-weight: bold;
+}
+
+.save-btn:hover {
+    background-color: #ffcc00;
+}
+
+.cancel-btn {
+    background-color: #666;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #888;
+}
+
+/* Mobile responsive styles for card management */
+@media (max-width: 768px) {
+    .card-management-container {
+        padding: 15px;
+    }
+
+    .deck-list {
+        flex-direction: column;
+    }
+
+    .deck-item {
+        justify-content: space-between;
+        padding: 15px;
+    }
+
+    .card-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .card-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 8px 16px;
+    }
+
+    .modal {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .save-btn, .cancel-btn {
+        width: 100%;
+        padding: 12px;
+    }
+}
