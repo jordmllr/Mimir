@@ -192,6 +192,27 @@ form {
         font-size: 16px;
         margin-bottom: 25px;
     }
+
+    /* Mobile navigation improvements */
+    .nav-link {
+        padding: 15px 25px;
+        font-size: 18px;
+        min-height: 48px; /* Ensure touch target size */
+        display: block;
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+        background-color: rgba(214, 179, 0, 0.1);
+        border: 1px solid #d6b300;
+        margin: 10px 0;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
+    }
+
+    .nav-link:active {
+        background-color: rgba(214, 179, 0, 0.3);
+        transform: scale(0.98);
+    }
 }
 
 /* Navigation styles */
@@ -501,6 +522,8 @@ input[type="text"]:focus {
     .deck-item {
         justify-content: space-between;
         padding: 15px;
+        min-height: 48px; /* Ensure touch target size */
+        touch-action: manipulation;
     }
 
     .card-item {
@@ -515,7 +538,9 @@ input[type="text"]:focus {
     }
 
     .edit-btn, .delete-btn {
-        padding: 8px 16px;
+        padding: 12px 16px;
+        min-height: 44px; /* Ensure touch target size */
+        touch-action: manipulation;
     }
 
     .modal {
@@ -529,6 +554,29 @@ input[type="text"]:focus {
 
     .save-btn, .cancel-btn {
         width: 100%;
-        padding: 12px;
+        padding: 15px;
+        min-height: 48px; /* Ensure touch target size */
+        touch-action: manipulation;
+    }
+
+    /* Mobile navigation in card management */
+    .card-management-container .nav-link {
+        padding: 15px 25px;
+        font-size: 18px;
+        min-height: 48px;
+        display: block;
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+        background-color: rgba(214, 179, 0, 0.1);
+        border: 1px solid #d6b300;
+        margin: 10px 0;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
+    }
+
+    .card-management-container .nav-link:active {
+        background-color: rgba(214, 179, 0, 0.3);
+        transform: scale(0.98);
     }
 }
