@@ -14,6 +14,11 @@
         <div x-data="cardCreation()" x-init="init()" class="card-creation-container">
             <h1>Create New Card</h1>
 
+            <!-- Swipe area indicator -->
+            <div class="swipe-area-hint">
+                Swipe here: ← Clear | Save →
+            </div>
+
             <form @submit.prevent="createCard()">
                 <div class="form-group">
                     <label for="prompt">Prompt (Front of card):</label>

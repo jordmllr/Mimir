@@ -18,15 +18,18 @@ h1 {
     touch-action: pan-y; /* Allow vertical scrolling but enable horizontal swipes */
 }
 
-/* Swipe instruction hint */
-.card-creation-container::before {
-    content: "💡 Swipe right to save • Swipe left to clear";
-    display: block;
+/* Swipe area hint */
+.swipe-area-hint {
+    background-color: rgba(214, 179, 0, 0.1);
+    border: 1px dashed #d6b300;
+    border-radius: 5px;
+    padding: 15px;
     text-align: center;
     color: #d6b300;
     font-size: 14px;
     margin-bottom: 20px;
     opacity: 0.8;
+    user-select: none;
 }
 
 .form-group {
@@ -51,6 +54,7 @@ h1 {
     font-size: 16px;
     resize: vertical;
     box-sizing: border-box;
+    touch-action: manipulation; /* Allow normal touch interactions on inputs */
 }
 
 .form-group textarea:focus {
