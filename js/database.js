@@ -30,10 +30,10 @@ function checkDatabase() {
     const actionContainer = document.getElementById('action-container');
     const createDatabaseBtn = document.getElementById('create-db-btn');
     const goToCardsBtn = document.getElementById('go-to-cards');
+    const resetDatabaseBtn = document.getElementById('reset-db-btn');
     
     request.onerror = () => {
         statusEl.textContent = 'Unable to access database.';
-        actionContainer.classList.remove('hidden');
     };
     
     request.onsuccess = (event) => {
@@ -44,10 +44,12 @@ function checkDatabase() {
             statusEl.textContent = 'Database exists but needs setup.';
             actionContainer.classList.remove('hidden');
             createDatabaseBtn.classList.remove('hidden');
+            resetDatabaseBtn.classList.remove('hidden');
         } else {
             statusEl.textContent = 'Database ready!';
             createDatabaseBtn.classList.add('hidden');
             goToCardsBtn.classList.remove('hidden');
+            resetDatabaseBtn.classList.add('hidden');
         }
         db.close();
     };
