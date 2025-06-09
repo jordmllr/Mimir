@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    height: 100vh;
+    min-height: 80vh;
     box-sizing: border-box;
 }
 
@@ -18,7 +18,7 @@ h1 {
     padding: 20px;
     position: relative;
     touch-action: pan-y; /* Allow vertical scrolling but enable horizontal swipes */
-    height: calc(100vh - 40px); /* Full height minus padding */
+    height: calc(80vh - 40px); /* 80% of viewport height minus padding for iOS compatibility */
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -162,12 +162,12 @@ form {
 @media (max-width: 768px) {
     body {
         padding: 10px;
-        height: 100vh;
+        min-height: 80vh;
     }
 
     .card-creation-container {
         padding: 15px;
-        height: calc(100vh - 30px); /* Adjust for smaller padding */
+        height: calc(80vh - 30px); /* 80% of viewport height for iOS compatibility */
     }
 
     .form-group textarea {
