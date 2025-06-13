@@ -112,9 +112,9 @@ h1 {
     }
 }
 
-/* Navigation styles */
-.navigation {
-    margin-top: 20px;
+/* Navigation styles - Minimalist */
+.navigation-section {
+    padding: 20px;
     text-align: center;
 }
 
@@ -171,90 +171,113 @@ input[type="text"]:focus {
     box-shadow: 0 0 8px rgba(214, 179, 0, 0.3);
 }
 
-/* Card Management Styles */
+/* Card Management Styles - Minimalist Layout */
 .card-management-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-sizing: border-box;
     color: #ffffff;
+    padding: 0;
+    overflow-y: auto;
 }
 
-.loading {
-    text-align: center;
+.loading-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #d6b300;
     font-size: 18px;
-    padding: 40px;
 }
 
-/* Deck Selection */
-.deck-selection h2 {
-    color: #d6b300;
-    margin-bottom: 15px;
+/* Deck Selection - Minimalist Style */
+.deck-selection-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
 .deck-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
 }
 
 .deck-item {
-    background-color: #002147;
-    padding: 12px 16px;
-    border-radius: 5px;
+    background-color: transparent;
+    border: none;
+    padding: 15px 20px;
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 15px;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+    text-align: center;
 }
 
 .deck-item:hover {
-    background-color: #003366;
+    color: #d6b300;
 }
 
 .deck-item.active {
-    background-color: #d6b300;
-    color: #001336;
+    color: #d6b300;
 }
 
 .deck-name {
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .deck-count {
-    opacity: 0.7;
+    opacity: 0.6;
     font-size: 0.9em;
 }
 
-/* Cards Section */
-.cards-section h3 {
-    color: #d6b300;
-    margin: 20px 0 15px 0;
+/* Cards Section - Minimalist Style */
+.cards-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
-.no-cards {
-    text-align: center;
-    color: #888;
-    padding: 40px;
-    font-style: italic;
+.no-cards-message {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 16px;
 }
 
 .cards-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    padding: 20px;
+    gap: 30px;
 }
 
-.card-item {
-    background-color: #002147;
-    border-radius: 5px;
-    padding: 15px;
+.card-display {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
     gap: 15px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(214, 179, 0, 0.1);
+}
+
+.card-display:last-child {
+    border-bottom: none;
 }
 
 .card-content {
@@ -262,78 +285,81 @@ input[type="text"]:focus {
 }
 
 .card-prompt, .card-response {
-    margin-bottom: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
-.card-prompt strong, .card-response strong {
-    color: #d6b300;
+.card-divider {
+    width: 50%;
+    height: 1px;
+    background-color: rgba(214, 179, 0, 0.3);
+    margin: 15px auto;
 }
 
 .card-tags {
-    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
-.card-tags strong {
+.tag-item {
+    background-color: transparent;
     color: #d6b300;
-}
-
-.tag {
-    background-color: #d6b300;
-    color: #001336;
-    padding: 2px 6px;
-    border-radius: 3px;
+    padding: 4px 8px;
+    border: 1px solid rgba(214, 179, 0, 0.3);
+    border-radius: 12px;
     font-size: 0.8em;
-    margin-right: 5px;
     display: inline-block;
-}
-
-.card-meta {
-    color: #888;
-    font-size: 0.9em;
 }
 
 .card-actions {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
 }
 
-.edit-btn, .delete-btn {
-    padding: 6px 12px;
+.action-btn {
+    padding: 8px 16px;
     border: none;
-    border-radius: 3px;
+    background-color: transparent;
     cursor: pointer;
     font-size: 0.9em;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    border-radius: 4px;
 }
 
-.edit-btn {
-    background-color: #4CAF50;
-    color: white;
+.edit-action {
+    color: #d6b300;
+    border: 1px solid rgba(214, 179, 0, 0.3);
 }
 
-.edit-btn:hover {
-    background-color: #45a049;
+.edit-action:hover {
+    background-color: rgba(214, 179, 0, 0.1);
 }
 
-.delete-btn {
-    background-color: #f44336;
-    color: white;
+.delete-action {
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
-.delete-btn:hover {
-    background-color: #da190b;
+.delete-action:hover {
+    background-color: rgba(255, 107, 107, 0.1);
 }
 
-/* Modal Styles */
+/* Modal Styles - Minimalist */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(4, 9, 33, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -342,9 +368,10 @@ input[type="text"]:focus {
 }
 
 .modal {
-    background-color: #001336;
+    background-color: #040921;
+    border: 1px solid rgba(214, 179, 0, 0.2);
     border-radius: 8px;
-    padding: 20px;
+    padding: 30px;
     max-width: 500px;
     width: 100%;
     max-height: 80vh;
@@ -354,68 +381,107 @@ input[type="text"]:focus {
 .modal h3 {
     color: #d6b300;
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: normal;
 }
 
 .modal .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .modal .form-group label {
     display: block;
-    color: #d6b300;
-    margin-bottom: 5px;
-    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+    font-weight: normal;
+    font-size: 14px;
 }
 
 .modal textarea, .modal input[type="text"] {
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     border: none;
     border-radius: 4px;
-    background-color: #002147;
+    background-color: transparent;
+    border: 1px solid rgba(214, 179, 0, 0.2);
     color: #ffffff;
-    font-size: 14px;
+    font-size: 16px;
     box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.modal textarea:focus, .modal input[type="text"]:focus {
+    outline: none;
+    border-color: rgba(214, 179, 0, 0.5);
 }
 
 .modal textarea {
-    min-height: 80px;
+    min-height: 100px;
     resize: vertical;
+    line-height: 1.4;
 }
 
 .modal-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 15px;
+    margin-top: 25px;
+    justify-content: center;
 }
 
 .save-btn, .cancel-btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
+    font-size: 16px;
+    transition: all 0.3s;
+    min-width: 100px;
 }
 
 .save-btn {
-    background-color: #d6b300;
-    color: #001336;
-    font-weight: bold;
+    background-color: transparent;
+    color: #d6b300;
+    border: 1px solid #d6b300;
 }
 
 .save-btn:hover {
-    background-color: #ffcc00;
+    background-color: rgba(214, 179, 0, 0.1);
 }
 
 .cancel-btn {
-    background-color: #666;
-    color: white;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .cancel-btn:hover {
-    background-color: #888;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Status Messages */
+.message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+    z-index: 1001;
+    max-width: 300px;
+    text-align: center;
+}
+
+.message.success {
+    background-color: rgba(76, 175, 80, 0.9);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.message.error {
+    background-color: rgba(244, 67, 54, 0.9);
+    border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 /* Floating Action Button */
@@ -463,44 +529,57 @@ input[type="text"]:focus {
 /* Mobile responsive styles for card management */
 @media (max-width: 768px) {
     .card-management-container {
+        padding: 0;
+        height: 100vh;
+    }
+
+    .deck-selection-section {
         padding: 15px;
     }
 
     .deck-list {
-        flex-direction: column;
+        max-width: 100%;
     }
 
     .deck-item {
-        justify-content: space-between;
-        padding: 15px;
+        padding: 18px 20px;
         min-height: 48px; /* Ensure touch target size */
         touch-action: manipulation;
+        font-size: 16px;
     }
 
-    .card-item {
-        flex-direction: column;
-        gap: 10px;
+    .cards-list {
+        padding: 15px;
+        gap: 25px;
+    }
+
+    .card-display {
+        padding: 15px 0;
+    }
+
+    .card-prompt, .card-response {
+        font-size: 16px; /* Prevent zoom on iOS */
     }
 
     .card-actions {
-        flex-direction: row;
-        justify-content: flex-end;
-        width: 100%;
+        gap: 12px;
     }
 
-    .edit-btn, .delete-btn {
+    .action-btn {
         padding: 12px 16px;
         min-height: 44px; /* Ensure touch target size */
         touch-action: manipulation;
+        font-size: 16px;
     }
 
     .modal {
         margin: 10px;
-        padding: 15px;
+        padding: 20px;
     }
 
     .modal-actions {
         flex-direction: column;
+        gap: 10px;
     }
 
     .save-btn, .cancel-btn {
@@ -510,24 +589,23 @@ input[type="text"]:focus {
         touch-action: manipulation;
     }
 
-    /* Mobile navigation in card management */
-    .card-management-container .nav-link {
+    .navigation-section {
+        padding: 15px;
+    }
+
+    .nav-link {
         padding: 15px 25px;
-        font-size: 18px;
+        font-size: 16px;
         min-height: 48px;
         display: block;
         width: 100%;
         text-align: center;
         box-sizing: border-box;
-        background-color: rgba(214, 179, 0, 0.1);
-        border: 1px solid #d6b300;
-        margin: 10px 0;
         touch-action: manipulation;
         -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
     }
 
-    .card-management-container .nav-link:active {
-        background-color: rgba(214, 179, 0, 0.3);
+    .nav-link:active {
         transform: scale(0.98);
     }
 

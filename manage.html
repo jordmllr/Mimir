@@ -12,22 +12,13 @@
     <body>
         <!-- Card Management Component -->
         <div x-data="cardManagement()" x-init="init()" class="card-management-container">
-            <h1>Manage Cards</h1>
-
-            <!-- Card Count Display -->
-            <div class="card-count-display">
-                <span>Total Cards: </span>
-                <span x-text="totalCards" class="count-number"></span>
-            </div>
-
             <!-- Loading State -->
-            <div x-show="isLoading" class="loading">
+            <div x-show="isLoading" class="loading-state">
                 <span>Loading cards...</span>
             </div>
 
             <!-- Deck Selection -->
-            <div x-show="!isLoading" class="deck-selection">
-                <h2>Decks</h2>
+            <div x-show="!isLoading" class="deck-selection-section">
                 <div class="deck-list">
                     <template x-for="deck in decks" :key="deck.name">
                         <div
@@ -44,36 +35,32 @@
 
             <!-- Cards in Selected Deck -->
             <div x-show="!isLoading && selectedDeck" class="cards-section">
-                <hr class="divider">
-                <h3>Cards in <span x-text="selectedDeck"></span></h3>
+                <div class="divider-line"></div>
 
-                <div x-show="filteredCards.length === 0" class="no-cards">
-                    <p>No cards in this deck.</p>
+                <div x-show="filteredCards.length === 0" class="no-cards-message">
+                    <span>No cards in this deck.</span>
                 </div>
 
                 <div class="cards-list">
                     <template x-for="card in filteredCards" :key="card.card_id">
-                        <div class="card-item">
+                        <div class="card-display">
                             <div class="card-content">
                                 <div class="card-prompt">
-                                    <strong>Prompt:</strong> <span x-text="card.prompt"></span>
+                                    <span x-text="card.prompt"></span>
                                 </div>
+                                <div class="card-divider"></div>
                                 <div class="card-response">
-                                    <strong>Response:</strong> <span x-text="card.response"></span>
+                                    <span x-text="card.response"></span>
                                 </div>
                                 <div class="card-tags" x-show="card.tags && card.tags.length > 0">
-                                    <strong>Tags:</strong>
                                     <template x-for="tag in card.tags" :key="tag">
-                                        <span class="tag" x-text="tag"></span>
+                                        <span class="tag-item" x-text="tag"></span>
                                     </template>
-                                </div>
-                                <div class="card-meta">
-                                    <small>Created: <span x-text="formatDate(card.created_at)"></span></small>
                                 </div>
                             </div>
                             <div class="card-actions">
-                                <button @click="editCard(card)" class="edit-btn">Edit</button>
-                                <button @click="deleteCard(card.card_id)" class="delete-btn">Delete</button>
+                                <button @click="editCard(card)" class="action-btn edit-action">Edit</button>
+                                <button @click="deleteCard(card.card_id)" class="action-btn delete-action">Delete</button>
                             </div>
                         </div>
                     </template>
@@ -124,11 +111,18 @@
             </div>
 
             <!-- Navigation -->
-            <div class="navigation">
-                <hr class="divider">
+            <div class="navigation-section">
+                <div class="divider-line"></div>
                 <a href="index.html" class="nav-link">Create Cards</a>
             </div>
         </div>
+
+        <!-- Floating Action Button for Card Creation -->
+        <a href="index.html" class="fab" title="Create Cards">
+            <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                <path d="M8 3.5v9M3.5 8h9"/>
+            </svg>
+        </a>
 
         <script src="js/card-management.js"></script>
     </body>
