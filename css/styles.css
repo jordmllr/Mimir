@@ -50,10 +50,11 @@ h1 {
 }
 
 .divider-line {
-    width: 100%;
+    width: 90%;
     height: 1px;
     background-color: #d6b300;
     flex-shrink: 0;
+    align-self: center;
 }
 
 .response-section {
@@ -66,7 +67,7 @@ h1 {
 }
 
 .response-section textarea {
-    width: 70%;
+    width: 50%;
     height: 50%;
     border: none;
     background-color: transparent;
