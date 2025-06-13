@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="#040921">
+        <title>Mimir: Mobile Test</title>
+        <style>
+            body {
+                background-color: #040921;
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                height: -webkit-fill-available;
+                height: 100dvh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                overscroll-behavior: none;
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+                position: fixed;
+                width: 100%;
+                -webkit-user-select: none;
+                user-select: none;
+                -webkit-touch-callout: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            .test-content {
+                max-width: 80%;
+                padding: 20px;
+            }
+            
+            .test-item {
+                background-color: rgba(214, 179, 0, 0.1);
+                border: 1px solid rgba(214, 179, 0, 0.3);
+                border-radius: 8px;
+                padding: 15px;
+                margin: 10px 0;
+                color: #d6b300;
+            }
+            
+            .success {
+                color: #4caf50;
+                background-color: rgba(76, 175, 80, 0.1);
+                border-color: rgba(76, 175, 80, 0.3);
+            }
+            
+            .back-link {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                color: #d6b300;
+                text-decoration: none;
+                padding: 10px 15px;
+                border: 1px solid rgba(214, 179, 0, 0.3);
+                border-radius: 4px;
+                background-color: rgba(214, 179, 0, 0.1);
+            }
+        </style>
+        
+        <!-- Mobile app-like experience script -->
+        <script>
+            // Hide URL bar on mobile devices
+            function hideAddressBar() {
+                if (window.innerHeight < window.outerHeight) {
+                    setTimeout(() => {
+                        window.scrollTo(0, 1);
+                        setTimeout(() => {
+                            window.scrollTo(0, 0);
+                        }, 100);
+                    }, 100);
+                }
+            }
+            
+            window.addEventListener('load', hideAddressBar);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(hideAddressBar, 500);
+            });
+            
+            // Test mobile features
+            function runMobileTests() {
+                const results = [];
+                
+                // Test viewport dimensions
+                results.push({
+                    test: 'Viewport Height',
+                    result: `${window.innerHeight}px (${window.screen.height}px screen)`,
+                    success: window.innerHeight > 0
+                });
+                
+                // Test safe area support
+                const safeAreaTop = getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)');
+                results.push({
+                    test: 'Safe Area Support',
+                    result: safeAreaTop || 'Not supported',
+                    success: !!safeAreaTop
+                });
+                
+                // Test touch support
+                results.push({
+                    test: 'Touch Support',
+                    result: 'ontouchstart' in window ? 'Supported' : 'Not supported',
+                    success: 'ontouchstart' in window
+                });
+                
+                // Test orientation support
+                results.push({
+                    test: 'Orientation API',
+                    result: screen.orientation ? `${screen.orientation.type}` : 'Not supported',
+                    success: !!screen.orientation
+                });
+                
+                return results;
+            }
+            
+            window.addEventListener('load', () => {
+                const results = runMobileTests();
+                const container = document.getElementById('test-results');
+                
+                results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = `test-item ${result.success ? 'success' : ''}`;
+                    div.innerHTML = `
+                        <strong>${result.test}:</strong><br>
+                        ${result.result}
+                    `;
+                    container.appendChild(div);
+                });
+            });
+            
+            // Prevent unwanted mobile behaviors
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            document.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+        </script>
+    </head>
+    <body>
+        <a href="index.html" class="back-link">← Back to App</a>
+        
+        <div class="test-content">
+            <h1 style="color: #d6b300;">Mobile App Test</h1>
+            <p>This page tests mobile app-like features:</p>
+            
+            <div id="test-results">
+                <!-- Test results will be populated here -->
+            </div>
+            
+            <div class="test-item">
+                <strong>Instructions:</strong><br>
+                • URL bar should hide automatically<br>
+                • No pull-to-refresh<br>
+                • No pinch-to-zoom<br>
+                • Full screen experience<br>
+                • Safe area support on notched devices
+            </div>
+        </div>
+    </body>
+</html>
