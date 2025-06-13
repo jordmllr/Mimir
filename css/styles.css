@@ -418,6 +418,48 @@ input[type="text"]:focus {
     background-color: #888;
 }
 
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background-color: #d6b300;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    /* iOS-specific touch improvements */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.fab:hover {
+    background-color: #ffcc00;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.fab:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fab-icon {
+    width: 24px;
+    height: 24px;
+    color: #001336;
+    stroke: #001336;
+}
+
 /* Mobile responsive styles for card management */
 @media (max-width: 768px) {
     .card-management-container {
@@ -487,5 +529,21 @@ input[type="text"]:focus {
     .card-management-container .nav-link:active {
         background-color: rgba(214, 179, 0, 0.3);
         transform: scale(0.98);
+    }
+
+    /* Mobile FAB adjustments */
+    .fab {
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        /* Ensure minimum touch target size */
+        min-width: 48px;
+        min-height: 48px;
+    }
+
+    .fab-icon {
+        width: 26px;
+        height: 26px;
     }
 }
