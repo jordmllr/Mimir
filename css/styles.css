@@ -317,6 +317,187 @@ input[type="text"]:focus {
     display: inline-block;
 }
 
+/* Due Date Styles */
+.card-due-date {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 0.85em;
+}
+
+.due-date-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: normal;
+}
+
+.due-date-text {
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.due-date-text.due-overdue {
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.due-date-text.due-today {
+    color: #ffa726;
+    background-color: rgba(255, 167, 38, 0.1);
+}
+
+.due-date-text.due-soon {
+    color: #ffeb3b;
+    background-color: rgba(255, 235, 59, 0.1);
+}
+
+.due-date-text.due-future {
+    color: #4caf50;
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.due-date-text.due-unknown {
+    color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Card Review Styles */
+.card-review-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-sizing: border-box;
+    color: #ffffff;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.no-cards-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.no-cards-message h2 {
+    color: #d6b300;
+    margin-bottom: 20px;
+    font-weight: normal;
+}
+
+.no-cards-message p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.review-stats {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+}
+
+.review-stats p {
+    margin: 5px 0;
+}
+
+.review-session, .answer-review {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.review-progress {
+    color: #d6b300;
+    font-weight: 500;
+}
+
+.review-stats-mini {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.card-review-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 30px;
+}
+
+.card-prompt-review, .card-response-review {
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.4;
+    max-width: 80%;
+    padding: 20px;
+}
+
+.card-actions-review {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.show-answer-btn, .review-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+.show-answer-btn {
+    background-color: transparent;
+    color: #d6b300;
+    border: 2px solid #d6b300;
+}
+
+.show-answer-btn:hover {
+    background-color: rgba(214, 179, 0, 0.1);
+}
+
+.review-again {
+    background-color: transparent;
+    color: #ff6b6b;
+    border: 2px solid #ff6b6b;
+}
+
+.review-again:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.review-good {
+    background-color: transparent;
+    color: #4caf50;
+    border: 2px solid #4caf50;
+}
+
+.review-good:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
 .card-actions {
     display: flex;
     justify-content: center;
@@ -508,6 +689,24 @@ input[type="text"]:focus {
     user-select: none;
 }
 
+/* Dual FAB Container */
+.fab-container {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 1000;
+}
+
+.fab-container .fab {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    left: auto;
+}
+
 .fab:hover {
     background-color: #ffcc00;
     transform: scale(1.1);
@@ -618,6 +817,11 @@ input[type="text"]:focus {
         /* Ensure minimum touch target size */
         min-width: 48px;
         min-height: 48px;
+    }
+
+    .fab-container {
+        bottom: 20px;
+        gap: 15px;
     }
 
     .fab-icon {

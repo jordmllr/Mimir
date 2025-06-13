@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduler Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Spaced Repetition Scheduler Tests</h1>
+    
+    <div id="test-results"></div>
+
+    <script src="js/scheduler.js"></script>
+    <script>
+        // Test runner
+        function runTests() {
+            const results = document.getElementById('test-results');
+            let passCount = 0;
+            let totalCount = 0;
+
+            function test(name, testFn) {
+                totalCount++;
+                try {
+                    const result = testFn();
+                    if (result === true) {
+                        passCount++;
+                        results.innerHTML += `<div class="test-result pass">✅ ${name}</div>`;
+                    } else {
+                        results.innerHTML += `<div class="test-result fail">❌ ${name}: ${result}</div>`;
+                    }
+                } catch (error) {
+                    results.innerHTML += `<div class="test-result fail">❌ ${name}: ${error.message}</div>`;
+                }
+            }
+
+            // Test 1: Calculate next due date
+            test('Calculate next due date for interval 0', () => {
+                const baseDate = new Date('2024-01-01T00:00:00.000Z');
+                const dueDate = SpacedRepetitionScheduler.calculateNextDueDate(0, baseDate);
+                const expected = new Date('2024-01-02T00:00:00.000Z').toISOString();
+                return dueDate === expected ? true : `Expected ${expected}, got ${dueDate}`;
+            });
+
+            // Test 2: Calculate next due date for interval 1
+            test('Calculate next due date for interval 1', () => {
+                const baseDate = new Date('2024-01-01T00:00:00.000Z');
+                const dueDate = SpacedRepetitionScheduler.calculateNextDueDate(1, baseDate);
+                const expected = new Date('2024-01-03T00:00:00.000Z').toISOString();
+                return dueDate === expected ? true : `Expected ${expected}, got ${dueDate}`;
+            });
+
+            // Test 3: Calculate next due date for interval 3
+            test('Calculate next due date for interval 3', () => {
+                const baseDate = new Date('2024-01-01T00:00:00.000Z');
+                const dueDate = SpacedRepetitionScheduler.calculateNextDueDate(3, baseDate);
+                const expected = new Date('2024-01-09T00:00:00.000Z').toISOString(); // 2^3 = 8 days
+                return dueDate === expected ? true : `Expected ${expected}, got ${dueDate}`;
+            });
+
+            // Test 4: Initialize card
+            test('Initialize card with scheduling fields', () => {
+                const card = { card_id: 'test1', prompt: 'Test', response: 'Answer' };
+                const initialized = SpacedRepetitionScheduler.initializeCard(card);
+                
+                return (
+                    initialized.due_date &&
+                    initialized.review_interval === 0 &&
+                    initialized.review_count === 0 &&
+                    initialized.last_reviewed === null
+                ) ? true : 'Card not properly initialized';
+            });
+
+            // Test 5: Schedule successful review
+            test('Schedule card after successful review', () => {
+                const card = {
+                    card_id: 'test2',
+                    review_interval: 0,
+                    review_count: 0,
+                    due_date: '2024-01-01T00:00:00.000Z'
+                };
+                
+                const scheduled = SpacedRepetitionScheduler.scheduleCard(card, true);
+                
+                return (
+                    scheduled.review_interval === 1 &&
+                    scheduled.review_count === 1 &&
+                    scheduled.last_reviewed &&
+                    scheduled.due_date
+                ) ? true : 'Card not properly scheduled after success';
+            });
+
+            // Test 6: Schedule failed review
+            test('Schedule card after failed review', () => {
+                const card = {
+                    card_id: 'test3',
+                    review_interval: 2,
+                    review_count: 3,
+                    due_date: '2024-01-01T00:00:00.000Z'
+                };
+                
+                const scheduled = SpacedRepetitionScheduler.scheduleCard(card, false);
+                
+                return (
+                    scheduled.review_interval === 0 &&
+                    scheduled.review_count === 4 &&
+                    scheduled.last_reviewed &&
+                    scheduled.due_date
+                ) ? true : 'Card not properly scheduled after failure';
+            });
+
+            // Test 7: Check if card is due
+            test('Check if card is due', () => {
+                const today = new Date('2024-01-05T12:00:00.000Z');
+                const dueCard = { due_date: '2024-01-05T00:00:00.000Z' };
+                const futureCard = { due_date: '2024-01-10T00:00:00.000Z' };
+                const overdueCard = { due_date: '2024-01-01T00:00:00.000Z' };
+                
+                return (
+                    SpacedRepetitionScheduler.isCardDue(dueCard, today) &&
+                    !SpacedRepetitionScheduler.isCardDue(futureCard, today) &&
+                    SpacedRepetitionScheduler.isCardDue(overdueCard, today)
+                ) ? true : 'Card due check failed';
+            });
+
+            // Test 8: Check if card is overdue
+            test('Check if card is overdue', () => {
+                const today = new Date('2024-01-05T12:00:00.000Z');
+                const dueCard = { due_date: '2024-01-05T00:00:00.000Z' };
+                const futureCard = { due_date: '2024-01-10T00:00:00.000Z' };
+                const overdueCard = { due_date: '2024-01-01T00:00:00.000Z' };
+                
+                return (
+                    !SpacedRepetitionScheduler.isCardOverdue(dueCard, today) &&
+                    !SpacedRepetitionScheduler.isCardOverdue(futureCard, today) &&
+                    SpacedRepetitionScheduler.isCardOverdue(overdueCard, today)
+                ) ? true : 'Card overdue check failed';
+            });
+
+            // Test 9: Get days until due
+            test('Get days until due', () => {
+                const today = new Date('2024-01-05T12:00:00.000Z');
+                const dueCard = { due_date: '2024-01-05T00:00:00.000Z' };
+                const futureCard = { due_date: '2024-01-10T00:00:00.000Z' };
+                const overdueCard = { due_date: '2024-01-01T00:00:00.000Z' };
+                
+                const dueDays = SpacedRepetitionScheduler.getDaysUntilDue(dueCard, today);
+                const futureDays = SpacedRepetitionScheduler.getDaysUntilDue(futureCard, today);
+                const overdueDays = SpacedRepetitionScheduler.getDaysUntilDue(overdueCard, today);
+                
+                return (
+                    dueDays === 0 &&
+                    futureDays === 5 &&
+                    overdueDays === -4
+                ) ? true : `Days calculation failed: due=${dueDays}, future=${futureDays}, overdue=${overdueDays}`;
+            });
+
+            // Test 10: Filter due cards
+            test('Filter due cards from array', () => {
+                const today = new Date('2024-01-05T12:00:00.000Z');
+                const cards = [
+                    { card_id: '1', due_date: '2024-01-05T00:00:00.000Z' }, // due today
+                    { card_id: '2', due_date: '2024-01-10T00:00:00.000Z' }, // future
+                    { card_id: '3', due_date: '2024-01-01T00:00:00.000Z' }, // overdue
+                    { card_id: '4', due_date: '2024-01-04T00:00:00.000Z' }  // overdue
+                ];
+                
+                const dueCards = SpacedRepetitionScheduler.getDueCards(cards, today);
+                
+                return dueCards.length === 3 ? true : `Expected 3 due cards, got ${dueCards.length}`;
+            });
+
+            // Summary
+            results.innerHTML += `
+                <div class="test-section">
+                    <h2>Test Summary</h2>
+                    <p><strong>${passCount}/${totalCount}</strong> tests passed</p>
+                    ${passCount === totalCount ? 
+                        '<p style="color: green;">🎉 All tests passed!</p>' : 
+                        '<p style="color: red;">❌ Some tests failed</p>'
+                    }
+                </div>
+            `;
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

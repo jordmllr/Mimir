@@ -2,14 +2,16 @@
 const DB_CONFIG = {
     name: 'mimirDB',
     isDevelopment: false, // Set to false to persist cards between page loads
-    version: 2, // Incremented for schema changes
+    version: 3, // Incremented for schema changes - added due_date and review_interval
     stores: {
         cards: {
             keyPath: 'card_id',
             indexes: [
                 { name: 'prompt', unique: false },
                 { name: 'response', unique: false },
-                { name: 'tags', unique: false }
+                { name: 'tags', unique: false },
+                { name: 'due_date', unique: false },
+                { name: 'review_interval', unique: false }
             ]
         }
     }

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mimir: Review Cards</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <script src="js/database.js"></script>
+        <script src="js/scheduler.js"></script>
+        <script src="js/user_interactions.js"></script>
+    </head>
+    <body>
+        <!-- Review Component -->
+        <div x-data="cardReview()" x-init="init()" class="card-review-container">
+            <!-- Loading State -->
+            <div x-show="isLoading" class="loading-state">
+                <span>Loading cards for review...</span>
+            </div>
+
+            <!-- No Cards Due -->
+            <div x-show="!isLoading && dueCards.length === 0" class="no-cards-state">
+                <div class="no-cards-message">
+                    <h2>🎉 All caught up!</h2>
+                    <p>No cards are due for review right now.</p>
+                    <div class="review-stats">
+                        <p x-text="`Total cards: ${totalCards}`"></p>
+                        <p x-text="`Cards due today: ${dueCards.length}`"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Session -->
+            <div x-show="!isLoading && dueCards.length > 0 && !showingAnswer" class="review-session">
+                <div class="review-header">
+                    <div class="review-progress">
+                        <span x-text="`${currentCardIndex + 1} of ${dueCards.length}`"></span>
+                    </div>
+                    <div class="review-stats-mini">
+                        <span x-text="`Due: ${dueCards.length}`"></span>
+                    </div>
+                </div>
+
+                <div class="card-review-display">
+                    <div class="card-prompt-review">
+                        <span x-text="currentCard?.prompt || 'Loading...'"></span>
+                    </div>
+                    <div class="card-actions-review">
+                        <button @click="showAnswer()" class="show-answer-btn">Show Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answer Review -->
+            <div x-show="!isLoading && showingAnswer" class="answer-review">
+                <div class="review-header">
+                    <div class="review-progress">
+                        <span x-text="`${currentCardIndex + 1} of ${dueCards.length}`"></span>
+                    </div>
+                </div>
+
+                <div class="card-review-display">
+                    <div class="card-prompt-review">
+                        <span x-text="currentCard?.prompt || 'Loading...'"></span>
+                    </div>
+                    <div class="divider-line"></div>
+                    <div class="card-response-review">
+                        <span x-text="currentCard?.response || 'Loading...'"></span>
+                    </div>
+                    <div class="card-actions-review">
+                        <button @click="reviewCard(false)" class="review-btn review-again">Again</button>
+                        <button @click="reviewCard(true)" class="review-btn review-good">Good</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div x-show="message" class="message" :class="messageType">
+                <span x-text="message"></span>
+            </div>
+        </div>
+
+        <!-- Dual Floating Action Buttons -->
+        <div class="fab-container">
+            <!-- Create Cards FAB -->
+            <a href="index.html" class="fab" title="Create Cards">
+                <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                    <path d="M8 3.5v9M3.5 8h9"/>
+                </svg>
+            </a>
+
+            <!-- Manage Cards FAB -->
+            <a href="manage.html" class="fab" title="Manage Cards">
+                <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                    <rect height="11.5" width="8.25" y="2.75" x="1.75"/>
+                    <path d="m10 3.75 4.25 2-4.25 7.5"/>
+                </svg>
+            </a>
+        </div>
+
+        <script src="js/card-review.js"></script>
+    </body>
+</html>

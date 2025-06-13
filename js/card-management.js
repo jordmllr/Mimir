@@ -65,9 +65,15 @@ function cardManagement() {
                         const transaction = event.target.transaction;
                         const store = transaction.objectStore('cards');
 
-                        // Add tags index if it doesn't exist
+                        // Add new indexes if they don't exist
                         if (!store.indexNames.contains('tags')) {
                             store.createIndex('tags', 'tags', { unique: false });
+                        }
+                        if (!store.indexNames.contains('due_date')) {
+                            store.createIndex('due_date', 'due_date', { unique: false });
+                        }
+                        if (!store.indexNames.contains('review_interval')) {
+                            store.createIndex('review_interval', 'review_interval', { unique: false });
                         }
                     }
                 };
@@ -92,16 +98,29 @@ function cardManagement() {
         // Get all cards from IndexedDB
         getAllCards() {
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(['cards'], 'readonly');
+                const transaction = this.db.transaction(['cards'], 'readwrite');
                 const store = transaction.objectStore('cards');
                 const request = store.getAll();
 
                 request.onsuccess = () => {
-                    // Ensure all cards have tags array (for backward compatibility)
-                    const cards = request.result.map(card => ({
-                        ...card,
-                        tags: card.tags || []
-                    }));
+                    // Ensure all cards have required fields (for backward compatibility)
+                    const cards = request.result.map(card => {
+                        let updatedCard = {
+                            ...card,
+                            tags: card.tags || []
+                        };
+
+                        // Migrate cards that don't have scheduling fields
+                        if (!card.due_date || !card.hasOwnProperty('review_interval')) {
+                            updatedCard = SpacedRepetitionScheduler.initializeCard(updatedCard);
+
+                            // Save the migrated card back to the database
+                            store.put(updatedCard);
+                            console.log('Migrated card to include scheduling fields:', updatedCard.card_id);
+                        }
+
+                        return updatedCard;
+                    });
                     resolve(cards);
                 };
                 request.onerror = () => reject(request.error);
@@ -268,6 +287,56 @@ function cardManagement() {
         // Format date for display
         formatDate(dateString) {
             return new Date(dateString).toLocaleDateString();
+        },
+
+        // Format due date with status indicator
+        formatDueDate(card) {
+            if (!card.due_date) return 'Not scheduled';
+
+            const dueDate = new Date(card.due_date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            dueDate.setHours(0, 0, 0, 0);
+
+            const diffTime = dueDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return `Overdue (${Math.abs(diffDays)} days)`;
+            } else if (diffDays === 0) {
+                return 'Due today';
+            } else if (diffDays === 1) {
+                return 'Due tomorrow';
+            } else {
+                return `Due in ${diffDays} days`;
+            }
+        },
+
+        // Get due date status class for styling
+        getDueDateClass(card) {
+            if (!card.due_date) return 'due-unknown';
+
+            const daysUntilDue = SpacedRepetitionScheduler.getDaysUntilDue(card);
+
+            if (daysUntilDue < 0) return 'due-overdue';
+            if (daysUntilDue === 0) return 'due-today';
+            if (daysUntilDue <= 3) return 'due-soon';
+            return 'due-future';
+        },
+
+        // Get review statistics
+        getReviewStats() {
+            return SpacedRepetitionScheduler.getReviewStats(this.cards);
+        },
+
+        // Get cards due for review
+        getDueCards() {
+            return SpacedRepetitionScheduler.getDueCards(this.cards);
+        },
+
+        // Get overdue cards
+        getOverdueCards() {
+            return SpacedRepetitionScheduler.getOverdueCards(this.cards);
         },
 
         // Show message to user

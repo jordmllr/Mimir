@@ -96,6 +96,21 @@ function cardCreation() {
                         DB_CONFIG.stores.cards.indexes.forEach(index => {
                             store.createIndex(index.name, index.name, { unique: index.unique });
                         });
+                    } else {
+                        // Handle schema updates for existing database
+                        const transaction = event.target.transaction;
+                        const store = transaction.objectStore('cards');
+
+                        // Add new indexes if they don't exist
+                        if (!store.indexNames.contains('due_date')) {
+                            store.createIndex('due_date', 'due_date', { unique: false });
+                        }
+                        if (!store.indexNames.contains('review_interval')) {
+                            store.createIndex('review_interval', 'review_interval', { unique: false });
+                        }
+                        if (!store.indexNames.contains('tags')) {
+                            store.createIndex('tags', 'tags', { unique: false });
+                        }
                     }
                 };
             });
@@ -119,16 +134,17 @@ function cardCreation() {
             this.clearMessage();
 
             try {
-                const card = {
+                const baseCard = {
                     card_id: this.generateCardId(),
                     prompt: this.cardData.prompt.trim(),
                     response: this.cardData.response.trim(),
                     tags: this.parseTags(this.cardData.tags),
                     created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    review_count: 0,
-                    last_reviewed: null
+                    updated_at: new Date().toISOString()
                 };
+
+                // Initialize with scheduling fields
+                const card = SpacedRepetitionScheduler.initializeCard(baseCard);
 
                 console.log('Attempting to save card:', card.card_id);
                 await this.saveCardToDatabase(card);
