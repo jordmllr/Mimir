@@ -1,0 +1,64 @@
+{
+  "deck_name": "Mimir Introduction",
+  "description": "Learn how to use Mimir and understand the power of spaced repetition for effective learning",
+  "category": "Tutorial",
+  "difficulty": "Beginner",
+  "cards": [
+    {
+      "prompt": "What is Mimir designed for?",
+      "response": "Mimir is designed for learning and retaining information effectively using spaced repetition techniques.",
+      "tags": [
+        "mimir/basics"
+      ]
+    },
+    {
+      "prompt": "What makes memory a choice according to spaced repetition principles?",
+      "response": "Spaced repetition makes memory a choice by allowing you to deliberately strengthen memories through strategic review timing, rather than leaving retention to chance.",
+      "tags": [
+        "mimir/basics"
+      ]
+    },
+    {
+      "prompt": "How does spaced repetition work in Mimir?",
+      "response": "Mimir schedules cards for review at increasing intervals (2^n days) after each successful review, optimizing the timing to strengthen long-term memory retention.",
+      "tags": [
+        "mimir/scheduling"
+      ]
+    },
+    {
+      "prompt": "What are the three main sections of Mimir?",
+      "response": "Mimir has three main sections: Create (for making new flashcards), Manage (for organizing and editing cards), and Review (for studying cards using spaced repetition).",
+      "tags": [
+        "mimir/basics"
+      ]
+    },
+    {
+      "prompt": "What happens when you first create a new card in Mimir?",
+      "response": "New cards enter learning mode where they cycle endlessly until you get them right twice in the same session, then they graduate to the spaced repetition schedule.",
+      "tags": [
+        "mimir/learning-mode"
+      ]
+    },
+    {
+      "prompt": "Why is spaced repetition more effective than cramming?",
+      "response": "Spaced repetition leverages the psychological spacing effect - reviewing information at increasing intervals strengthens memory more effectively than massed practice (cramming).",
+      "tags": [
+        "mimir/basics"
+      ]
+    },
+    {
+      "prompt": "How should you write effective flashcard prompts?",
+      "response": "Write clear, specific prompts that test one concept at a time. Make them challenging enough to require recall but not so complex that they become confusing.",
+      "tags": [
+        "mimir/best-practices"
+      ]
+    },
+    {
+      "prompt": "What is the key principle behind Mimir's scheduling algorithm?",
+      "response": "Cards are reviewed just before you're likely to forget them, with intervals doubling after each successful review (1 day, 2 days, 4 days, 8 days, etc.).",
+      "tags": [
+        "mimir/scheduling"
+      ]
+    }
+  ]
+}
