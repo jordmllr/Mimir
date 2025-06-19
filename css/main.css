@@ -35,7 +35,7 @@ body {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px;
     }
-    
+
     .app-container {
         border-radius: 20px;
         max-height: 90vh;
@@ -49,7 +49,7 @@ body {
         padding: 0;
         align-items: stretch;
     }
-    
+
     .app-container {
         max-width: none;
         box-shadow: none;
@@ -57,14 +57,16 @@ body {
     }
 }
 
-/* Hide URL bar on mobile (iOS Safari) */
+/* Hide URL bar on mobile (iOS Safari) - Modern approach using dynamic viewport height */
 @media (max-width: 480px) {
     .app-container {
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
+        min-height: 100vh; /* Fallback for older browsers */
     }
-    
-    html {
-        height: -webkit-fill-available;
+
+    /* Use dynamic viewport height for modern browsers that support it */
+    @supports (height: 100dvh) {
+        .app-container {
+            min-height: 100dvh;
+        }
     }
 }
