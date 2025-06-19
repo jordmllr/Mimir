@@ -62,8 +62,10 @@
         </script>
     </head>
     <body>
-        <!-- Review Component -->
-        <div x-data="cardReview()" x-init="init()" class="card-review-container">
+        <!-- Smartphone-like container for desktop -->
+        <div class="smartphone-container">
+            <!-- Review Component -->
+            <div x-data="cardReview()" x-init="init()" class="card-review-container">
             <!-- Loading State -->
             <div x-show="isLoading" class="loading-state">
                 <span>Loading cards for review...</span>
@@ -129,24 +131,25 @@
             <div x-show="message" class="message" :class="messageType">
                 <span x-text="message"></span>
             </div>
-        </div>
+            </div>
 
-        <!-- Dual Floating Action Buttons -->
-        <div class="fab-container">
-            <!-- Create Cards FAB -->
-            <a href="index.html" class="fab" title="Create Cards">
-                <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
-                    <path d="M8 3.5v9M3.5 8h9"/>
-                </svg>
-            </a>
+            <!-- Dual Floating Action Buttons -->
+            <div class="fab-container">
+                <!-- Create Cards FAB -->
+                <a href="index.html" class="fab" title="Create Cards">
+                    <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                        <path d="M8 3.5v9M3.5 8h9"/>
+                    </svg>
+                </a>
 
-            <!-- Manage Cards FAB -->
-            <a href="manage.html" class="fab" title="Manage Cards">
-                <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
-                    <rect height="11.5" width="8.25" y="2.75" x="1.75"/>
-                    <path d="m10 3.75 4.25 2-4.25 7.5"/>
-                </svg>
-            </a>
+                <!-- Manage Cards FAB -->
+                <a href="manage.html" class="fab" title="Manage Cards">
+                    <svg class="fab-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                        <rect height="11.5" width="8.25" y="2.75" x="1.75"/>
+                        <path d="m10 3.75 4.25 2-4.25 7.5"/>
+                    </svg>
+                </a>
+            </div>
         </div>
 
         <script src="js/card-review.js"></script>

@@ -113,6 +113,44 @@ h1 {
 
 /* Form actions and message styles - removed for simplified layout */
 
+/* Desktop minimalist container */
+@media (min-width: 769px) {
+    body {
+        background: radial-gradient(ellipse at center, #030818 0%, #020714 60%, #010408 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        overflow: auto;
+    }
+
+    .smartphone-container {
+        width: 375px; /* Smartphone-inspired width */
+        max-width: 400px;
+        height: 812px; /* Smartphone-inspired height */
+        max-height: 90vh;
+        background-color: #040921;
+        border-radius: 16px; /* Clean rounded corners */
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.4), /* Depth shadow */
+            0 0 60px rgba(158, 129, 60, 0.15), /* Subtle golden glow - light in water */
+            0 0 120px rgba(158, 129, 60, 0.08); /* Extended ethereal glow */
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-creation-container,
+    .card-management-container,
+    .card-review-container {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+
 /* Mobile-specific improvements for app-like experience */
 @media (max-width: 768px) {
     html {
@@ -137,6 +175,11 @@ h1 {
         -webkit-touch-callout: none;
         /* Prevent highlighting on tap */
         -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Hide smartphone container on mobile - use direct content */
+    .smartphone-container {
+        display: contents;
     }
 
     .card-creation-container {
