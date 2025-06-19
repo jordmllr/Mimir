@@ -937,3 +937,303 @@ input[type="text"]:focus {
         height: 26px;
     }
 }
+
+/* Focus Mode Styles */
+.focus-mode-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(4, 9, 33, 0.9);
+    border: 1px solid rgba(214, 179, 0, 0.3);
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1002;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.focus-mode-indicator:hover {
+    border-color: rgba(214, 179, 0, 0.6);
+    background-color: rgba(4, 9, 33, 0.95);
+    transform: scale(1.05);
+}
+
+.focus-indicator-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.focus-indicator-icon {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.focus-mode-indicator.active {
+    border-color: #d6b300;
+    background-color: rgba(214, 179, 0, 0.1);
+    box-shadow: 0 0 20px rgba(214, 179, 0, 0.3);
+}
+
+.focus-mode-indicator.active .focus-indicator-content {
+    color: #d6b300;
+}
+
+.focus-mode-indicator.active .focus-indicator-icon {
+    opacity: 1;
+    animation: focus-pulse 2s ease-in-out infinite;
+}
+
+@keyframes focus-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Focus Mode Messages */
+.focus-message {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(4, 9, 33, 0.95);
+    border: 1px solid rgba(214, 179, 0, 0.4);
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: #d6b300;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1003;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: focus-message-enter 0.3s ease-out;
+    max-width: 300px;
+    text-align: center;
+}
+
+.focus-message.fade-out {
+    animation: focus-message-exit 0.3s ease-in forwards;
+}
+
+@keyframes focus-message-enter {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes focus-message-exit {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+/* Long Press Indicator for Mobile */
+.long-press-indicator {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(214, 179, 0, 0.6);
+    border-radius: 50%;
+    background-color: rgba(214, 179, 0, 0.1);
+    z-index: 1005;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.8s ease-out;
+}
+
+.long-press-indicator.active {
+    opacity: 1;
+    transform: scale(1);
+    border-color: #d6b300;
+    background-color: rgba(214, 179, 0, 0.2);
+    box-shadow: 0 0 20px rgba(214, 179, 0, 0.4);
+}
+
+/* Focus Mode Active State - Hide Navigation Elements */
+.focus-mode-active .fab-container,
+.focus-mode-active .fab {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.focus-mode-active .review-header,
+.focus-mode-active .review-progress,
+.focus-mode-active .review-stats-mini {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+/* Focus Mode - Expand Content Areas */
+.focus-mode-active .card-creation-container,
+.focus-mode-active .card-management-container,
+.focus-mode-active .card-review-container {
+    padding: 0;
+}
+
+.focus-mode-active .review-session,
+.focus-mode-active .answer-review {
+    padding: 10px 20px;
+}
+
+.focus-mode-active .card-review-display {
+    gap: 40px;
+}
+
+.focus-mode-active .card-prompt-review,
+.focus-mode-active .card-response-review {
+    font-size: 20px;
+    max-width: 90%;
+    padding: 30px;
+}
+
+/* Focus Mode - Enhanced Text Areas for Card Creation */
+.focus-mode-active .prompt-section textarea,
+.focus-mode-active .response-section textarea {
+    width: 70%;
+    height: 60%;
+    font-size: 20px;
+    padding: 30px;
+}
+
+/* Focus Mode - Card Management Enhancements */
+.focus-mode-active .deck-selection-section {
+    padding: 30px 20px;
+}
+
+.focus-mode-active .cards-section {
+    padding: 0;
+}
+
+.focus-mode-active .cards-list {
+    padding: 30px 20px;
+    gap: 40px;
+}
+
+.focus-mode-active .card-display {
+    padding: 25px 0;
+}
+
+.focus-mode-active .card-prompt,
+.focus-mode-active .card-response {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+/* Mobile Focus Mode Adjustments */
+@media (max-width: 768px) {
+    .focus-mode-indicator {
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        /* Ensure it's above mobile keyboards */
+        z-index: 1003;
+        /* Better touch target */
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Mobile touch improvements */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .focus-indicator-content {
+        font-size: 12px;
+        gap: 6px;
+    }
+
+    .focus-message {
+        top: 60px;
+        max-width: 280px;
+        font-size: 13px;
+        padding: 10px 16px;
+        /* Ensure it's above mobile keyboards */
+        z-index: 1004;
+        /* Better positioning for mobile */
+        left: 10px;
+        right: 10px;
+        transform: none;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .focus-mode-active .card-prompt-review,
+    .focus-mode-active .card-response-review {
+        font-size: 18px;
+        padding: 25px;
+        /* Better mobile readability */
+        line-height: 1.6;
+    }
+
+    .focus-mode-active .prompt-section textarea,
+    .focus-mode-active .response-section textarea {
+        width: 85%;
+        height: 70%;
+        font-size: 18px;
+        padding: 25px;
+        /* Better mobile text input */
+        line-height: 1.5;
+        /* Prevent zoom on iOS */
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    /* Hide focus indicator when mobile keyboard is open */
+    @media (max-height: 500px) {
+        .focus-mode-indicator {
+            opacity: 0.7;
+            transform: scale(0.8);
+        }
+
+        .focus-message {
+            top: 10px;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+    }
+
+    /* Enhanced mobile focus mode for review cards */
+    .focus-mode-active .review-session,
+    .focus-mode-active .answer-review {
+        padding: 5px 15px;
+    }
+
+    .focus-mode-active .card-actions-review {
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .focus-mode-active .show-answer-btn,
+    .focus-mode-active .review-btn {
+        min-height: 48px;
+        font-size: 16px;
+        padding: 12px 24px;
+        /* Better mobile touch targets */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(214, 179, 0, 0.3);
+    }
+}

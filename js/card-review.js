@@ -17,6 +17,7 @@ function cardReview() {
             console.log('Card review component initialized');
             await this.initDatabase();
             await this.loadDueCards();
+            this.initFocusMode();
         },
 
         // Initialize Database (Dexie)
@@ -27,6 +28,27 @@ function cardReview() {
             } catch (error) {
                 console.error('Failed to initialize database:', error);
                 this.showMessage('Failed to initialize database', 'error');
+            }
+        },
+
+        // Initialize focus mode integration
+        initFocusMode() {
+            if (typeof window.FocusMode !== 'undefined') {
+                // Register callbacks for focus mode changes
+                window.FocusMode.onEnter(() => {
+                    console.log('Card Review: Focus mode entered');
+                    // Auto-focus on show answer button if available
+                    setTimeout(() => {
+                        const showAnswerBtn = document.querySelector('.show-answer-btn');
+                        if (showAnswerBtn && !this.showingAnswer) {
+                            showAnswerBtn.focus();
+                        }
+                    }, 300);
+                });
+
+                window.FocusMode.onExit(() => {
+                    console.log('Card Review: Focus mode exited');
+                });
             }
         },
 

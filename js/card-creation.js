@@ -21,6 +21,7 @@ function cardCreation() {
             await this.loadCardCount();
             this.initSwipeDetection();
             this.initNavigationHandling();
+            this.initFocusMode();
         },
 
         // Initialize Database (Dexie)
@@ -74,7 +75,26 @@ function cardCreation() {
             }, 100);
         },
 
+        // Initialize focus mode integration
+        initFocusMode() {
+            if (typeof window.FocusMode !== 'undefined') {
+                // Register callbacks for focus mode changes
+                window.FocusMode.onEnter(() => {
+                    console.log('Card Creation: Focus mode entered');
+                    // Optional: Auto-focus on first textarea when entering focus mode
+                    setTimeout(() => {
+                        const promptTextarea = document.getElementById('prompt');
+                        if (promptTextarea && !promptTextarea.value.trim()) {
+                            promptTextarea.focus();
+                        }
+                    }, 300);
+                });
 
+                window.FocusMode.onExit(() => {
+                    console.log('Card Creation: Focus mode exited');
+                });
+            }
+        },
 
         // Create a new card
         async createCard(source = 'form') {

@@ -25,6 +25,7 @@ function cardManagement() {
             await this.initDatabase();
             await this.loadCards();
             this.buildDecks();
+            this.initFocusMode();
         },
 
         // Initialize Database (Dexie)
@@ -38,7 +39,19 @@ function cardManagement() {
             }
         },
 
+        // Initialize focus mode integration
+        initFocusMode() {
+            if (typeof window.FocusMode !== 'undefined') {
+                // Register callbacks for focus mode changes
+                window.FocusMode.onEnter(() => {
+                    console.log('Card Management: Focus mode entered');
+                });
 
+                window.FocusMode.onExit(() => {
+                    console.log('Card Management: Focus mode exited');
+                });
+            }
+        },
 
         // Load all cards from database
         async loadCards() {
