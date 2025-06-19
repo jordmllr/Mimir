@@ -159,8 +159,10 @@ h1 {
     }
 
     body {
-        /* Mobile radial background - same "light in water" as desktop */
-        background: radial-gradient(ellipse at center, #030818 0%, #020714 60%, #010408 100%);
+        /* Mobile background with more visible glow effect */
+        background:
+            radial-gradient(ellipse at center, rgba(158, 129, 60, 0.2) 0%, rgba(158, 129, 60, 0.1) 30%, transparent 60%),
+            radial-gradient(ellipse at center, #030818 0%, #020714 60%, #010408 100%);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -188,29 +190,14 @@ h1 {
         height: 100%;
         background-color: #040921;
         border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); /* Just depth shadow */
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 80px rgba(158, 129, 60, 0.25),
+            0 0 160px rgba(158, 129, 60, 0.15);
         position: relative;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-    }
-
-    /* Add glow effect to the body background on mobile */
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: radial-gradient(
-            ellipse at center,
-            rgba(158, 129, 60, 0.12) 0%,
-            rgba(158, 129, 60, 0.06) 40%,
-            transparent 70%
-        );
-        pointer-events: none;
-        z-index: -1;
     }
 
     .card-creation-container,
