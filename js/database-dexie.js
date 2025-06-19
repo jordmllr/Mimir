@@ -46,7 +46,7 @@ class MimirDatabase {
     static async getAllCards() {
         try {
             const cards = await db.cards.toArray();
-            
+
             // Ensure backward compatibility - migrate cards without scheduling fields
             const migratedCards = [];
             let needsMigration = false;
@@ -87,7 +87,22 @@ class MimirDatabase {
     static async saveCard(card) {
         try {
             console.log('Starting database save for card:', card.card_id);
-            await db.cards.add(card);
+
+            // Create a clean, serializable copy of the card object
+            const cleanCard = {
+                card_id: card.card_id,
+                prompt: card.prompt,
+                response: card.response,
+                tags: Array.isArray(card.tags) ? [...card.tags] : [],
+                due_date: card.due_date,
+                review_interval: card.review_interval,
+                review_count: card.review_count,
+                last_reviewed: card.last_reviewed,
+                created_at: card.created_at,
+                updated_at: card.updated_at
+            };
+
+            await db.cards.add(cleanCard);
             console.log('Card successfully saved to database:', card.card_id);
             return card.card_id;
         } catch (error) {
@@ -103,11 +118,39 @@ class MimirDatabase {
      */
     static async updateCard(card) {
         try {
-            await db.cards.put(card);
+            console.log('Database updateCard called with:', card);
+            console.log('Card ID:', card.card_id);
+            console.log('Card structure:', Object.keys(card));
+
+            // Validate card has required fields
+            if (!card.card_id) {
+                throw new Error('Card missing card_id field');
+            }
+
+            // Create a clean, serializable copy of the card object
+            // This removes any Proxy objects or non-serializable properties
+            const cleanCard = {
+                card_id: card.card_id,
+                prompt: card.prompt,
+                response: card.response,
+                tags: Array.isArray(card.tags) ? [...card.tags] : [],
+                due_date: card.due_date,
+                review_interval: card.review_interval,
+                review_count: card.review_count,
+                last_reviewed: card.last_reviewed,
+                created_at: card.created_at,
+                updated_at: card.updated_at
+            };
+
+            console.log('Clean card for database:', cleanCard);
+
+            await db.cards.put(cleanCard);
             console.log('Card successfully updated in database:', card.card_id);
             return card.card_id;
         } catch (error) {
             console.error('Failed to update card:', card.card_id, error);
+            console.error('Error name:', error.name);
+            console.error('Error message:', error.message);
             throw error;
         }
     }
@@ -136,12 +179,12 @@ class MimirDatabase {
         try {
             const today = new Date(checkDate);
             today.setUTCHours(23, 59, 59, 999); // End of day in UTC
-            
+
             const dueCards = await db.cards
                 .where('due_date')
                 .belowOrEqual(today.toISOString())
                 .toArray();
-            
+
             return dueCards;
         } catch (error) {
             console.error('Failed to get due cards:', error);
@@ -161,7 +204,7 @@ class MimirDatabase {
                 .where('tags')
                 .anyOf(tagArray)
                 .toArray();
-            
+
             return cards;
         } catch (error) {
             console.error('Failed to get cards by tags:', error);
@@ -182,7 +225,7 @@ class MimirDatabase {
                 }
                 return tags;
             }, []);
-            
+
             // Return unique tags
             return [...new Set(allTags)];
         } catch (error) {
@@ -200,7 +243,7 @@ class MimirDatabase {
             const totalCards = await db.cards.count();
             const dueCards = await this.getDueCards();
             const allTags = await this.getAllTags();
-            
+
             return {
                 totalCards,
                 dueCards: dueCards.length,
