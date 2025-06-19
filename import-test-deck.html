@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Spanish IR Test Deck</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+    <script src="js/database-dexie.js"></script>
+    <script src="js/scheduler.js"></script>
+</head>
+<body>
+    <div class="smartphone-container">
+        <div style="padding: 20px; text-align: center;">
+            <h1>Import Spanish IR Test Deck</h1>
+            <p>This will import 20 Spanish sentences with IR conjugations into your Mimir database.</p>
+            
+            <div id="status" style="margin: 20px 0; padding: 15px; border-radius: 8px; background-color: var(--bg-secondary);">
+                Ready to import test deck...
+            </div>
+            
+            <button id="importBtn" onclick="importTestDeck()" style="
+                background-color: var(--accent-primary);
+                color: var(--bg-primary);
+                border: none;
+                padding: 15px 30px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin: 10px;
+            ">
+                Import Spanish IR Deck
+            </button>
+            
+            <button onclick="clearDatabase()" style="
+                background-color: var(--status-error);
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin: 10px;
+            ">
+                Clear All Cards
+            </button>
+            
+            <div style="margin-top: 30px;">
+                <a href="index.html" style="color: var(--accent-primary); text-decoration: none; margin: 0 10px;">Create Cards</a>
+                <a href="manage.html" style="color: var(--accent-primary); text-decoration: none; margin: 0 10px;">Manage Cards</a>
+                <a href="learn.html" style="color: var(--accent-primary); text-decoration: none; margin: 0 10px;">Learn Cards</a>
+                <a href="review.html" style="color: var(--accent-primary); text-decoration: none; margin: 0 10px;">Review Cards</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const testDeckData = {
+            "deck_name": "Spanish IR Conjugations",
+            "description": "20 sentences illustrating different conjugations of the Spanish verb 'ir' (to go)",
+            "cards": [
+                {
+                    "prompt": "Yo voy al mercado.",
+                    "response": "I go to the market.",
+                    "tags": ["spanish", "ir", "present", "yo"]
+                },
+                {
+                    "prompt": "Tú vas a la escuela.",
+                    "response": "You go to school.",
+                    "tags": ["spanish", "ir", "present", "tú"]
+                },
+                {
+                    "prompt": "Él va al trabajo.",
+                    "response": "He goes to work.",
+                    "tags": ["spanish", "ir", "present", "él"]
+                },
+                {
+                    "prompt": "Ella va a casa.",
+                    "response": "She goes home.",
+                    "tags": ["spanish", "ir", "present", "ella"]
+                },
+                {
+                    "prompt": "Nosotros vamos al parque.",
+                    "response": "We go to the park.",
+                    "tags": ["spanish", "ir", "present", "nosotros"]
+                },
+                {
+                    "prompt": "Vosotros vais al cine.",
+                    "response": "You all go to the movies.",
+                    "tags": ["spanish", "ir", "present", "vosotros"]
+                },
+                {
+                    "prompt": "Ellos van al restaurante.",
+                    "response": "They go to the restaurant.",
+                    "tags": ["spanish", "ir", "present", "ellos"]
+                },
+                {
+                    "prompt": "Yo fui a la playa ayer.",
+                    "response": "I went to the beach yesterday.",
+                    "tags": ["spanish", "ir", "preterite", "yo"]
+                },
+                {
+                    "prompt": "Tú fuiste al médico.",
+                    "response": "You went to the doctor.",
+                    "tags": ["spanish", "ir", "preterite", "tú"]
+                },
+                {
+                    "prompt": "Ella fue de compras.",
+                    "response": "She went shopping.",
+                    "tags": ["spanish", "ir", "preterite", "ella"]
+                },
+                {
+                    "prompt": "Nosotros fuimos al museo.",
+                    "response": "We went to the museum.",
+                    "tags": ["spanish", "ir", "preterite", "nosotros"]
+                },
+                {
+                    "prompt": "Ellos fueron a Madrid.",
+                    "response": "They went to Madrid.",
+                    "tags": ["spanish", "ir", "preterite", "ellos"]
+                },
+                {
+                    "prompt": "Yo iba al colegio todos los días.",
+                    "response": "I used to go to school every day.",
+                    "tags": ["spanish", "ir", "imperfect", "yo"]
+                },
+                {
+                    "prompt": "Tú ibas a visitarla.",
+                    "response": "You were going to visit her.",
+                    "tags": ["spanish", "ir", "imperfect", "tú"]
+                },
+                {
+                    "prompt": "Nosotros íbamos juntos.",
+                    "response": "We used to go together.",
+                    "tags": ["spanish", "ir", "imperfect", "nosotros"]
+                },
+                {
+                    "prompt": "Yo iré mañana.",
+                    "response": "I will go tomorrow.",
+                    "tags": ["spanish", "ir", "future", "yo"]
+                },
+                {
+                    "prompt": "Tú irás con nosotros.",
+                    "response": "You will go with us.",
+                    "tags": ["spanish", "ir", "future", "tú"]
+                },
+                {
+                    "prompt": "Ellos irán en coche.",
+                    "response": "They will go by car.",
+                    "tags": ["spanish", "ir", "future", "ellos"]
+                },
+                {
+                    "prompt": "Voy a estudiar esta noche.",
+                    "response": "I'm going to study tonight.",
+                    "tags": ["spanish", "ir", "near_future", "yo"]
+                },
+                {
+                    "prompt": "Vamos a comer juntos.",
+                    "response": "We're going to eat together.",
+                    "tags": ["spanish", "ir", "near_future", "nosotros"]
+                }
+            ]
+        };
+
+        async function importTestDeck() {
+            const statusDiv = document.getElementById('status');
+            const importBtn = document.getElementById('importBtn');
+            
+            try {
+                statusDiv.innerHTML = 'Initializing database...';
+                statusDiv.style.backgroundColor = 'var(--status-info)';
+                importBtn.disabled = true;
+                
+                // Initialize database
+                await MimirDB.init();
+                
+                statusDiv.innerHTML = 'Importing cards...';
+                let importedCount = 0;
+                
+                // Import each card
+                for (const cardData of testDeckData.cards) {
+                    const card = {
+                        card_id: `spanish_ir_${Date.now()}_${importedCount}`,
+                        prompt: cardData.prompt,
+                        response: cardData.response,
+                        tags: cardData.tags,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    // Initialize with scheduler
+                    const initializedCard = SpacedRepetitionScheduler.initializeCard(card);
+                    
+                    // Save to database
+                    await MimirDB.saveCard(initializedCard);
+                    importedCount++;
+                    
+                    statusDiv.innerHTML = `Imported ${importedCount}/${testDeckData.cards.length} cards...`;
+                }
+                
+                statusDiv.innerHTML = `✅ Successfully imported ${importedCount} Spanish IR conjugation cards!<br>
+                    <small>You can now go to the Manage page to see the "spanish" deck and start learning.</small>`;
+                statusDiv.style.backgroundColor = 'var(--status-success)';
+                
+            } catch (error) {
+                console.error('Import failed:', error);
+                statusDiv.innerHTML = `❌ Import failed: ${error.message}`;
+                statusDiv.style.backgroundColor = 'var(--status-error)';
+            } finally {
+                importBtn.disabled = false;
+            }
+        }
+
+        async function clearDatabase() {
+            if (confirm('Are you sure you want to delete ALL cards? This cannot be undone.')) {
+                const statusDiv = document.getElementById('status');
+                try {
+                    statusDiv.innerHTML = 'Clearing database...';
+                    statusDiv.style.backgroundColor = 'var(--status-warning)';
+                    
+                    await MimirDB.init();
+                    const allCards = await MimirDB.getAllCards();
+                    
+                    for (const card of allCards) {
+                        await MimirDB.deleteCard(card.card_id);
+                    }
+                    
+                    statusDiv.innerHTML = `✅ Cleared ${allCards.length} cards from database.`;
+                    statusDiv.style.backgroundColor = 'var(--status-success)';
+                } catch (error) {
+                    console.error('Clear failed:', error);
+                    statusDiv.innerHTML = `❌ Clear failed: ${error.message}`;
+                    statusDiv.style.backgroundColor = 'var(--status-error)';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
