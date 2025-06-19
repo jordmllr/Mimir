@@ -10,7 +10,6 @@ function cardCreation() {
         isLoading: false,
         message: '',
         messageType: 'success', // 'success' or 'error'
-        db: null,
         swipeDetector: null,
         totalCards: 0,
         lastSwipeTime: 0, // Track last swipe to prevent rapid successive swipes
@@ -24,10 +23,10 @@ function cardCreation() {
             this.initNavigationHandling();
         },
 
-        // Initialize IndexedDB
+        // Initialize Database (Dexie)
         async initDatabase() {
             try {
-                this.db = await this.openDatabase();
+                await MimirDB.init();
                 console.log('Database initialized for card creation');
             } catch (error) {
                 console.error('Failed to initialize database:', error);
@@ -75,46 +74,7 @@ function cardCreation() {
             }, 100);
         },
 
-        // Open IndexedDB connection
-        openDatabase() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
 
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve(request.result);
-
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-
-                    // Create cards object store if it doesn't exist
-                    if (!db.objectStoreNames.contains('cards')) {
-                        const store = db.createObjectStore('cards', {
-                            keyPath: DB_CONFIG.stores.cards.keyPath
-                        });
-
-                        // Create indexes
-                        DB_CONFIG.stores.cards.indexes.forEach(index => {
-                            store.createIndex(index.name, index.name, { unique: index.unique });
-                        });
-                    } else {
-                        // Handle schema updates for existing database
-                        const transaction = event.target.transaction;
-                        const store = transaction.objectStore('cards');
-
-                        // Add new indexes if they don't exist
-                        if (!store.indexNames.contains('due_date')) {
-                            store.createIndex('due_date', 'due_date', { unique: false });
-                        }
-                        if (!store.indexNames.contains('review_interval')) {
-                            store.createIndex('review_interval', 'review_interval', { unique: false });
-                        }
-                        if (!store.indexNames.contains('tags')) {
-                            store.createIndex('tags', 'tags', { unique: false });
-                        }
-                    }
-                };
-            });
-        },
 
         // Create a new card
         async createCard(source = 'form') {
@@ -164,35 +124,9 @@ function cardCreation() {
             }
         },
 
-        // Save card to IndexedDB
-        saveCardToDatabase(card) {
-            return new Promise((resolve, reject) => {
-                console.log('Starting database transaction for card:', card.card_id);
-
-                const transaction = this.db.transaction(['cards'], 'readwrite');
-                const store = transaction.objectStore('cards');
-
-                transaction.oncomplete = () => {
-                    console.log('Database transaction completed for card:', card.card_id);
-                };
-
-                transaction.onerror = (event) => {
-                    console.error('Database transaction failed for card:', card.card_id, event);
-                    reject(event.target.error);
-                };
-
-                const request = store.add(card);
-
-                request.onsuccess = () => {
-                    console.log('Card successfully added to database:', card.card_id);
-                    resolve(request.result);
-                };
-
-                request.onerror = () => {
-                    console.error('Failed to add card to database:', card.card_id, request.error);
-                    reject(request.error);
-                };
-            });
+        // Save card to database (Dexie)
+        async saveCardToDatabase(card) {
+            return await MimirDB.saveCard(card);
         },
 
         // Load total card count

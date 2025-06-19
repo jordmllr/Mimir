@@ -9,7 +9,6 @@ function cardManagement() {
         isLoading: true,
         message: '',
         messageType: 'success',
-        db: null,
         totalCards: 0,
 
         // Edit modal data
@@ -28,10 +27,10 @@ function cardManagement() {
             this.buildDecks();
         },
 
-        // Initialize IndexedDB
+        // Initialize Database (Dexie)
         async initDatabase() {
             try {
-                this.db = await this.openDatabase();
+                await MimirDB.init();
                 console.log('Database initialized for card management');
             } catch (error) {
                 console.error('Failed to initialize database:', error);
@@ -39,52 +38,13 @@ function cardManagement() {
             }
         },
 
-        // Open IndexedDB connection
-        openDatabase() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
 
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve(request.result);
-
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-
-                    // Create cards object store if it doesn't exist
-                    if (!db.objectStoreNames.contains('cards')) {
-                        const store = db.createObjectStore('cards', {
-                            keyPath: DB_CONFIG.stores.cards.keyPath
-                        });
-
-                        // Create indexes
-                        DB_CONFIG.stores.cards.indexes.forEach(index => {
-                            store.createIndex(index.name, index.name, { unique: index.unique });
-                        });
-                    } else {
-                        // Handle schema updates for existing database
-                        const transaction = event.target.transaction;
-                        const store = transaction.objectStore('cards');
-
-                        // Add new indexes if they don't exist
-                        if (!store.indexNames.contains('tags')) {
-                            store.createIndex('tags', 'tags', { unique: false });
-                        }
-                        if (!store.indexNames.contains('due_date')) {
-                            store.createIndex('due_date', 'due_date', { unique: false });
-                        }
-                        if (!store.indexNames.contains('review_interval')) {
-                            store.createIndex('review_interval', 'review_interval', { unique: false });
-                        }
-                    }
-                };
-            });
-        },
 
         // Load all cards from database
         async loadCards() {
             try {
                 this.isLoading = true;
-                this.cards = await this.getAllCards();
+                this.cards = await MimirDB.getAllCards();
                 this.totalCards = this.cards.length;
                 console.log('Loaded cards:', this.cards);
             } catch (error) {
@@ -93,38 +53,6 @@ function cardManagement() {
             } finally {
                 this.isLoading = false;
             }
-        },
-
-        // Get all cards from IndexedDB
-        getAllCards() {
-            return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(['cards'], 'readwrite');
-                const store = transaction.objectStore('cards');
-                const request = store.getAll();
-
-                request.onsuccess = () => {
-                    // Ensure all cards have required fields (for backward compatibility)
-                    const cards = request.result.map(card => {
-                        let updatedCard = {
-                            ...card,
-                            tags: card.tags || []
-                        };
-
-                        // Migrate cards that don't have scheduling fields
-                        if (!card.due_date || !card.hasOwnProperty('review_interval')) {
-                            updatedCard = SpacedRepetitionScheduler.initializeCard(updatedCard);
-
-                            // Save the migrated card back to the database
-                            store.put(updatedCard);
-                            console.log('Migrated card to include scheduling fields:', updatedCard.card_id);
-                        }
-
-                        return updatedCard;
-                    });
-                    resolve(cards);
-                };
-                request.onerror = () => reject(request.error);
-            });
         },
 
         // Build deck list from cards
@@ -247,28 +175,14 @@ function cardManagement() {
             }
         },
 
-        // Update card in IndexedDB
-        updateCardInDatabase(card) {
-            return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(['cards'], 'readwrite');
-                const store = transaction.objectStore('cards');
-                const request = store.put(card);
-
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
+        // Update card in database (Dexie)
+        async updateCardInDatabase(card) {
+            return await MimirDB.updateCard(card);
         },
 
-        // Delete card from IndexedDB
-        deleteCardFromDatabase(cardId) {
-            return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction(['cards'], 'readwrite');
-                const store = transaction.objectStore('cards');
-                const request = store.delete(cardId);
-
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
+        // Delete card from database (Dexie)
+        async deleteCardFromDatabase(cardId) {
+            return await MimirDB.deleteCard(cardId);
         },
 
         // Parse tags from string input
