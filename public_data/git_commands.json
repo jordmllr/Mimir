@@ -1,0 +1,1037 @@
+{
+  "deck_name": "Git Commands Essentials",
+  "description": "Essential Git commands for developers - learn by doing common Git tasks",
+  "category": "Programming",
+  "difficulty": "Beginner to Intermediate",
+  "cards": [
+    {
+      "prompt": "Initialize a new Git repository in the current directory",
+      "response": "git init",
+      "tags": [
+        "git",
+        "setup",
+        "repository",
+        "init"
+      ]
+    },
+    {
+      "prompt": "Clone a repository from GitHub URL https://github.com/user/repo.git",
+      "response": "git clone https://github.com/user/repo.git",
+      "tags": [
+        "git",
+        "clone",
+        "github",
+        "remote"
+      ]
+    },
+    {
+      "prompt": "Check the status of your working directory and staging area",
+      "response": "git status",
+      "tags": [
+        "git",
+        "status",
+        "working-directory",
+        "staging"
+      ]
+    },
+    {
+      "prompt": "Add a specific file named 'index.html' to the staging area",
+      "response": "git add index.html",
+      "tags": [
+        "git",
+        "add",
+        "staging",
+        "files"
+      ]
+    },
+    {
+      "prompt": "Add all modified files to the staging area",
+      "response": "git add .",
+      "tags": [
+        "git",
+        "add",
+        "staging",
+        "all-files"
+      ]
+    },
+    {
+      "prompt": "Commit staged changes with the message 'Fix login bug'",
+      "response": "git commit -m \"Fix login bug\"",
+      "tags": [
+        "git",
+        "commit",
+        "message"
+      ]
+    },
+    {
+      "prompt": "View the commit history in a condensed format",
+      "response": "git log --oneline",
+      "tags": [
+        "git",
+        "log",
+        "history",
+        "oneline"
+      ]
+    },
+    {
+      "prompt": "Show the differences between working directory and staging area",
+      "response": "git diff",
+      "tags": [
+        "git",
+        "diff",
+        "changes",
+        "working-directory"
+      ]
+    },
+    {
+      "prompt": "Show the differences between staging area and last commit",
+      "response": "git diff --staged",
+      "tags": [
+        "git",
+        "diff",
+        "staged",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "Create a new branch named 'feature-login'",
+      "response": "git branch feature-login",
+      "tags": [
+        "git",
+        "branch",
+        "create",
+        "feature"
+      ]
+    },
+    {
+      "prompt": "Switch to an existing branch named 'develop'",
+      "response": "git checkout develop",
+      "tags": [
+        "git",
+        "checkout",
+        "switch",
+        "branch"
+      ]
+    },
+    {
+      "prompt": "Create and switch to a new branch named 'hotfix' in one command",
+      "response": "git checkout -b hotfix",
+      "tags": [
+        "git",
+        "checkout",
+        "create",
+        "switch",
+        "branch"
+      ]
+    },
+    {
+      "prompt": "List all local branches",
+      "response": "git branch",
+      "tags": [
+        "git",
+        "branch",
+        "list",
+        "local"
+      ]
+    },
+    {
+      "prompt": "List all branches including remote branches",
+      "response": "git branch -a",
+      "tags": [
+        "git",
+        "branch",
+        "list",
+        "remote",
+        "all"
+      ]
+    },
+    {
+      "prompt": "Delete a local branch named 'old-feature'",
+      "response": "git branch -d old-feature",
+      "tags": [
+        "git",
+        "branch",
+        "delete",
+        "local"
+      ]
+    },
+    {
+      "prompt": "Merge the 'feature-login' branch into the current branch",
+      "response": "git merge feature-login",
+      "tags": [
+        "git",
+        "merge",
+        "branch",
+        "feature"
+      ]
+    },
+    {
+      "prompt": "Push your current branch to the remote repository",
+      "response": "git push",
+      "tags": [
+        "git",
+        "push",
+        "remote",
+        "upload"
+      ]
+    },
+    {
+      "prompt": "Push a new branch 'feature-x' to remote and set up tracking",
+      "response": "git push -u origin feature-x",
+      "tags": [
+        "git",
+        "push",
+        "upstream",
+        "tracking",
+        "new-branch"
+      ]
+    },
+    {
+      "prompt": "Pull the latest changes from the remote repository",
+      "response": "git pull",
+      "tags": [
+        "git",
+        "pull",
+        "remote",
+        "download",
+        "merge"
+      ]
+    },
+    {
+      "prompt": "Fetch changes from remote without merging them",
+      "response": "git fetch",
+      "tags": [
+        "git",
+        "fetch",
+        "remote",
+        "download"
+      ]
+    },
+    {
+      "prompt": "Add a remote repository named 'upstream' with URL https://github.com/original/repo.git",
+      "response": "git remote add upstream https://github.com/original/repo.git",
+      "tags": [
+        "git",
+        "remote",
+        "add",
+        "upstream"
+      ]
+    },
+    {
+      "prompt": "List all configured remote repositories",
+      "response": "git remote -v",
+      "tags": [
+        "git",
+        "remote",
+        "list",
+        "verbose"
+      ]
+    },
+    {
+      "prompt": "Unstage a file named 'config.js' (remove from staging area)",
+      "response": "git reset HEAD config.js",
+      "tags": [
+        "git",
+        "reset",
+        "unstage",
+        "staging"
+      ]
+    },
+    {
+      "prompt": "Discard changes in working directory for file 'temp.txt'",
+      "response": "git checkout -- temp.txt",
+      "tags": [
+        "git",
+        "checkout",
+        "discard",
+        "working-directory"
+      ]
+    },
+    {
+      "prompt": "Undo the last commit but keep changes in working directory",
+      "response": "git reset --soft HEAD~1",
+      "tags": [
+        "git",
+        "reset",
+        "undo",
+        "commit",
+        "soft"
+      ]
+    },
+    {
+      "prompt": "Undo the last commit and discard all changes",
+      "response": "git reset --hard HEAD~1",
+      "tags": [
+        "git",
+        "reset",
+        "undo",
+        "commit",
+        "hard"
+      ]
+    },
+    {
+      "prompt": "Create a lightweight tag named 'v1.0' on the current commit",
+      "response": "git tag v1.0",
+      "tags": [
+        "git",
+        "tag",
+        "version",
+        "lightweight"
+      ]
+    },
+    {
+      "prompt": "Create an annotated tag 'v2.0' with message 'Release version 2.0'",
+      "response": "git tag -a v2.0 -m \"Release version 2.0\"",
+      "tags": [
+        "git",
+        "tag",
+        "annotated",
+        "version",
+        "message"
+      ]
+    },
+    {
+      "prompt": "Push all tags to the remote repository",
+      "response": "git push --tags",
+      "tags": [
+        "git",
+        "push",
+        "tags",
+        "remote"
+      ]
+    },
+    {
+      "prompt": "Show the contents of a specific commit using its hash abc1234",
+      "response": "git show abc1234",
+      "tags": [
+        "git",
+        "show",
+        "commit",
+        "hash"
+      ]
+    },
+    {
+      "prompt": "Stash your current uncommitted changes",
+      "response": "git stash",
+      "tags": [
+        "git",
+        "stash",
+        "save",
+        "uncommitted"
+      ]
+    },
+    {
+      "prompt": "Apply the most recent stash and remove it from stash list",
+      "response": "git stash pop",
+      "tags": [
+        "git",
+        "stash",
+        "pop",
+        "apply"
+      ]
+    },
+    {
+      "prompt": "List all stashes",
+      "response": "git stash list",
+      "tags": [
+        "git",
+        "stash",
+        "list"
+      ]
+    },
+    {
+      "prompt": "Apply a specific stash (stash@{1}) without removing it",
+      "response": "git stash apply stash@{1}",
+      "tags": [
+        "git",
+        "stash",
+        "apply",
+        "specific"
+      ]
+    },
+    {
+      "prompt": "Rebase current branch onto 'main' branch",
+      "response": "git rebase main",
+      "tags": [
+        "git",
+        "rebase",
+        "branch",
+        "main"
+      ]
+    },
+    {
+      "prompt": "Start an interactive rebase for the last 3 commits",
+      "response": "git rebase -i HEAD~3",
+      "tags": [
+        "git",
+        "rebase",
+        "interactive",
+        "commits"
+      ]
+    },
+    {
+      "prompt": "Abort a rebase that's in progress",
+      "response": "git rebase --abort",
+      "tags": [
+        "git",
+        "rebase",
+        "abort",
+        "cancel"
+      ]
+    },
+    {
+      "prompt": "Continue a rebase after resolving conflicts",
+      "response": "git rebase --continue",
+      "tags": [
+        "git",
+        "rebase",
+        "continue",
+        "conflicts"
+      ]
+    },
+    {
+      "prompt": "Cherry-pick a specific commit abc1234 to current branch",
+      "response": "git cherry-pick abc1234",
+      "tags": [
+        "git",
+        "cherry-pick",
+        "commit",
+        "apply"
+      ]
+    },
+    {
+      "prompt": "Show who last modified each line of file 'app.js'",
+      "response": "git blame app.js",
+      "tags": [
+        "git",
+        "blame",
+        "author",
+        "lines"
+      ]
+    },
+    {
+      "prompt": "Search for commits containing the word 'password' in commit messages",
+      "response": "git log --grep=\"password\"",
+      "tags": [
+        "git",
+        "log",
+        "search",
+        "grep",
+        "commit-message"
+      ]
+    },
+    {
+      "prompt": "Find commits that added or removed the word 'TODO'",
+      "response": "git log -S\"TODO\"",
+      "tags": [
+        "git",
+        "log",
+        "search",
+        "pickaxe",
+        "content"
+      ]
+    },
+    {
+      "prompt": "Show a graph of branch history in the terminal",
+      "response": "git log --graph --oneline --all",
+      "tags": [
+        "git",
+        "log",
+        "graph",
+        "branches",
+        "visual"
+      ]
+    },
+    {
+      "prompt": "Configure your global Git username to 'John Doe'",
+      "response": "git config --global user.name \"John Doe\"",
+      "tags": [
+        "git",
+        "config",
+        "global",
+        "username"
+      ]
+    },
+    {
+      "prompt": "Configure your global Git email to 'john@example.com'",
+      "response": "git config --global user.email \"john@example.com\"",
+      "tags": [
+        "git",
+        "config",
+        "global",
+        "email"
+      ]
+    },
+    {
+      "prompt": "View all global Git configuration settings",
+      "response": "git config --global --list",
+      "tags": [
+        "git",
+        "config",
+        "global",
+        "list"
+      ]
+    },
+    {
+      "prompt": "Create a .gitignore file entry to ignore all .log files",
+      "response": "*.log",
+      "tags": [
+        "git",
+        "gitignore",
+        "files",
+        "pattern"
+      ]
+    },
+    {
+      "prompt": "Create a .gitignore entry to ignore the entire 'node_modules' directory",
+      "response": "node_modules/",
+      "tags": [
+        "git",
+        "gitignore",
+        "directory",
+        "node_modules"
+      ]
+    },
+    {
+      "prompt": "Remove a file 'old-file.txt' from Git tracking and delete it",
+      "response": "git rm old-file.txt",
+      "tags": [
+        "git",
+        "rm",
+        "remove",
+        "delete",
+        "tracking"
+      ]
+    },
+    {
+      "prompt": "Remove a file 'secret.txt' from Git tracking but keep it locally",
+      "response": "git rm --cached secret.txt",
+      "tags": [
+        "git",
+        "rm",
+        "cached",
+        "untrack",
+        "keep-local"
+      ]
+    },
+    {
+      "prompt": "Rename a file from 'oldname.txt' to 'newname.txt' in Git",
+      "response": "git mv oldname.txt newname.txt",
+      "tags": [
+        "git",
+        "mv",
+        "rename",
+        "move"
+      ]
+    },
+    {
+      "prompt": "Show the last 5 commits in the log",
+      "response": "git log -5",
+      "tags": [
+        "git",
+        "log",
+        "limit",
+        "recent"
+      ]
+    },
+    {
+      "prompt": "Show commits from the last week",
+      "response": "git log --since=\"1 week ago\"",
+      "tags": [
+        "git",
+        "log",
+        "time",
+        "recent"
+      ]
+    },
+    {
+      "prompt": "Show commits by a specific author 'Jane Smith'",
+      "response": "git log --author=\"Jane Smith\"",
+      "tags": [
+        "git",
+        "log",
+        "author",
+        "filter"
+      ]
+    },
+    {
+      "prompt": "Show only the files changed in each commit",
+      "response": "git log --name-only",
+      "tags": [
+        "git",
+        "log",
+        "files",
+        "changes"
+      ]
+    },
+    {
+      "prompt": "Show a summary of changes (insertions/deletions) for each commit",
+      "response": "git log --stat",
+      "tags": [
+        "git",
+        "log",
+        "statistics",
+        "summary"
+      ]
+    },
+    {
+      "prompt": "Compare two branches 'main' and 'feature' to see differences",
+      "response": "git diff main..feature",
+      "tags": [
+        "git",
+        "diff",
+        "branches",
+        "compare"
+      ]
+    },
+    {
+      "prompt": "Show only the names of files that differ between two commits",
+      "response": "git diff --name-only HEAD~1 HEAD",
+      "tags": [
+        "git",
+        "diff",
+        "files",
+        "names-only"
+      ]
+    },
+    {
+      "prompt": "Create a patch file from the last commit",
+      "response": "git format-patch -1 HEAD",
+      "tags": [
+        "git",
+        "patch",
+        "format",
+        "export"
+      ]
+    },
+    {
+      "prompt": "Apply a patch file named '0001-fix.patch'",
+      "response": "git apply 0001-fix.patch",
+      "tags": [
+        "git",
+        "apply",
+        "patch",
+        "import"
+      ]
+    },
+    {
+      "prompt": "Check if your working directory is clean (no uncommitted changes)",
+      "response": "git status --porcelain",
+      "tags": [
+        "git",
+        "status",
+        "clean",
+        "porcelain"
+      ]
+    },
+    {
+      "prompt": "Show the current branch name only",
+      "response": "git branch --show-current",
+      "tags": [
+        "git",
+        "branch",
+        "current",
+        "name"
+      ]
+    },
+    {
+      "prompt": "Switch to the previous branch you were on",
+      "response": "git checkout -",
+      "tags": [
+        "git",
+        "checkout",
+        "previous",
+        "branch"
+      ]
+    },
+    {
+      "prompt": "Force push your branch (use with caution!)",
+      "response": "git push --force",
+      "tags": [
+        "git",
+        "push",
+        "force",
+        "dangerous"
+      ]
+    },
+    {
+      "prompt": "Safer force push that won't overwrite others' work",
+      "response": "git push --force-with-lease",
+      "tags": [
+        "git",
+        "push",
+        "force",
+        "safe",
+        "lease"
+      ]
+    },
+    {
+      "prompt": "Pull changes and rebase instead of merge",
+      "response": "git pull --rebase",
+      "tags": [
+        "git",
+        "pull",
+        "rebase",
+        "linear-history"
+      ]
+    },
+    {
+      "prompt": "Set up a global alias 'st' for 'status'",
+      "response": "git config --global alias.st status",
+      "tags": [
+        "git",
+        "config",
+        "alias",
+        "shortcut"
+      ]
+    },
+    {
+      "prompt": "Set up a global alias 'co' for 'checkout'",
+      "response": "git config --global alias.co checkout",
+      "tags": [
+        "git",
+        "config",
+        "alias",
+        "shortcut"
+      ]
+    },
+    {
+      "prompt": "Set up a global alias 'br' for 'branch'",
+      "response": "git config --global alias.br branch",
+      "tags": [
+        "git",
+        "config",
+        "alias",
+        "shortcut"
+      ]
+    },
+    {
+      "prompt": "Show the URL of the remote repository named 'origin'",
+      "response": "git remote get-url origin",
+      "tags": [
+        "git",
+        "remote",
+        "url",
+        "origin"
+      ]
+    },
+    {
+      "prompt": "Change the URL of remote 'origin' to a new URL",
+      "response": "git remote set-url origin https://github.com/user/new-repo.git",
+      "tags": [
+        "git",
+        "remote",
+        "set-url",
+        "change"
+      ]
+    },
+    {
+      "prompt": "Remove a remote repository named 'old-remote'",
+      "response": "git remote remove old-remote",
+      "tags": [
+        "git",
+        "remote",
+        "remove",
+        "delete"
+      ]
+    },
+    {
+      "prompt": "Show which files are tracked by Git in the current directory",
+      "response": "git ls-files",
+      "tags": [
+        "git",
+        "ls-files",
+        "tracked",
+        "list"
+      ]
+    },
+    {
+      "prompt": "Show which files are ignored by Git",
+      "response": "git ls-files --ignored --exclude-standard",
+      "tags": [
+        "git",
+        "ls-files",
+        "ignored",
+        "gitignore"
+      ]
+    },
+    {
+      "prompt": "Clean untracked files from working directory (dry run first)",
+      "response": "git clean -n",
+      "tags": [
+        "git",
+        "clean",
+        "untracked",
+        "dry-run"
+      ]
+    },
+    {
+      "prompt": "Actually clean untracked files from working directory",
+      "response": "git clean -f",
+      "tags": [
+        "git",
+        "clean",
+        "untracked",
+        "force"
+      ]
+    },
+    {
+      "prompt": "Clean untracked files and directories",
+      "response": "git clean -fd",
+      "tags": [
+        "git",
+        "clean",
+        "untracked",
+        "directories"
+      ]
+    },
+    {
+      "prompt": "Show the commit hash of the current HEAD",
+      "response": "git rev-parse HEAD",
+      "tags": [
+        "git",
+        "rev-parse",
+        "hash",
+        "head"
+      ]
+    },
+    {
+      "prompt": "Show the short commit hash of the current HEAD",
+      "response": "git rev-parse --short HEAD",
+      "tags": [
+        "git",
+        "rev-parse",
+        "short",
+        "hash"
+      ]
+    },
+    {
+      "prompt": "Find the merge base between 'main' and 'feature' branches",
+      "response": "git merge-base main feature",
+      "tags": [
+        "git",
+        "merge-base",
+        "branches",
+        "common-ancestor"
+      ]
+    },
+    {
+      "prompt": "Show all commits that are in 'feature' but not in 'main'",
+      "response": "git log main..feature",
+      "tags": [
+        "git",
+        "log",
+        "branch-diff",
+        "commits"
+      ]
+    },
+    {
+      "prompt": "Show all commits that are in either 'main' or 'feature' but not both",
+      "response": "git log main...feature",
+      "tags": [
+        "git",
+        "log",
+        "symmetric-diff",
+        "branches"
+      ]
+    },
+    {
+      "prompt": "Squash the last 3 commits into one (interactive rebase)",
+      "response": "git rebase -i HEAD~3",
+      "tags": [
+        "git",
+        "rebase",
+        "squash",
+        "interactive"
+      ]
+    },
+    {
+      "prompt": "Amend the last commit with new changes (don't change message)",
+      "response": "git commit --amend --no-edit",
+      "tags": [
+        "git",
+        "commit",
+        "amend",
+        "no-edit"
+      ]
+    },
+    {
+      "prompt": "Amend the last commit and change its message",
+      "response": "git commit --amend -m \"New commit message\"",
+      "tags": [
+        "git",
+        "commit",
+        "amend",
+        "message"
+      ]
+    },
+    {
+      "prompt": "Show the reflog (history of HEAD movements)",
+      "response": "git reflog",
+      "tags": [
+        "git",
+        "reflog",
+        "history",
+        "head"
+      ]
+    },
+    {
+      "prompt": "Recover a 'lost' commit using reflog entry HEAD@{2}",
+      "response": "git checkout HEAD@{2}",
+      "tags": [
+        "git",
+        "reflog",
+        "recover",
+        "lost-commit"
+      ]
+    },
+    {
+      "prompt": "Create a new branch from a reflog entry HEAD@{5}",
+      "response": "git checkout -b recovered-branch HEAD@{5}",
+      "tags": [
+        "git",
+        "reflog",
+        "branch",
+        "recover"
+      ]
+    },
+    {
+      "prompt": "Show Git version",
+      "response": "git --version",
+      "tags": [
+        "git",
+        "version",
+        "info"
+      ]
+    },
+    {
+      "prompt": "Get help for the 'log' command",
+      "response": "git help log",
+      "tags": [
+        "git",
+        "help",
+        "documentation"
+      ]
+    },
+    {
+      "prompt": "Show a brief help for the 'status' command",
+      "response": "git status --help",
+      "tags": [
+        "git",
+        "help",
+        "status",
+        "brief"
+      ]
+    },
+    {
+      "prompt": "Initialize a bare repository (for use as a remote)",
+      "response": "git init --bare",
+      "tags": [
+        "git",
+        "init",
+        "bare",
+        "remote"
+      ]
+    },
+    {
+      "prompt": "Clone only the latest commit (shallow clone)",
+      "response": "git clone --depth 1 https://github.com/user/repo.git",
+      "tags": [
+        "git",
+        "clone",
+        "shallow",
+        "depth"
+      ]
+    },
+    {
+      "prompt": "Convert a shallow clone to a full repository",
+      "response": "git fetch --unshallow",
+      "tags": [
+        "git",
+        "fetch",
+        "unshallow",
+        "full"
+      ]
+    },
+    {
+      "prompt": "Show the size of the Git repository",
+      "response": "git count-objects -vH",
+      "tags": [
+        "git",
+        "count-objects",
+        "size",
+        "statistics"
+      ]
+    },
+    {
+      "prompt": "Compress and optimize the Git repository",
+      "response": "git gc",
+      "tags": [
+        "git",
+        "gc",
+        "garbage-collect",
+        "optimize"
+      ]
+    },
+    {
+      "prompt": "Verify the integrity of the Git repository",
+      "response": "git fsck",
+      "tags": [
+        "git",
+        "fsck",
+        "verify",
+        "integrity"
+      ]
+    },
+    {
+      "prompt": "Show which branch contains a specific commit abc1234",
+      "response": "git branch --contains abc1234",
+      "tags": [
+        "git",
+        "branch",
+        "contains",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "Show the most recent tag reachable from current commit",
+      "response": "git describe --tags",
+      "tags": [
+        "git",
+        "describe",
+        "tags",
+        "recent"
+      ]
+    },
+    {
+      "prompt": "List all tags in the repository",
+      "response": "git tag",
+      "tags": [
+        "git",
+        "tag",
+        "list",
+        "all"
+      ]
+    },
+    {
+      "prompt": "Delete a local tag named 'v1.0'",
+      "response": "git tag -d v1.0",
+      "tags": [
+        "git",
+        "tag",
+        "delete",
+        "local"
+      ]
+    },
+    {
+      "prompt": "Delete a remote tag named 'v1.0' from origin",
+      "response": "git push origin --delete v1.0",
+      "tags": [
+        "git",
+        "push",
+        "delete",
+        "remote-tag"
+      ]
+    }
+  ]
+}

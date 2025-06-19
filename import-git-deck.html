@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Git Commands Deck</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+    <script src="js/database-dexie.js"></script>
+    <script src="js/scheduler.js"></script>
+</head>
+<body>
+    <div class="smartphone-container">
+        <div style="padding: 20px; text-align: center;">
+            <h1>📚 Import Git Commands Deck</h1>
+            <p>This will import <strong>95 essential Git commands</strong> into your Mimir database.</p>
+            <p>Perfect for developers learning Git version control!</p>
+            
+            <div id="status" style="margin: 20px 0; padding: 15px; border-radius: 8px; background-color: var(--bg-secondary); color: var(--text-primary);">
+                Ready to import Git commands deck...
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <button id="importBtn" onclick="importGitDeck()" style="
+                    background-color: var(--accent-primary);
+                    color: var(--bg-primary);
+                    border: none;
+                    padding: 15px 30px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin: 10px;
+                ">
+                    🚀 Import Git Commands
+                </button>
+                
+                <button onclick="clearDatabase()" style="
+                    background-color: var(--status-error);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin: 10px;
+                ">
+                    🗑️ Clear All Cards
+                </button>
+            </div>
+            
+            <div style="margin: 30px 0; padding: 15px; background-color: var(--bg-tertiary); border-radius: 8px; text-align: left;">
+                <h3 style="color: var(--accent-primary); margin-top: 0;">📋 What's Included:</h3>
+                <ul style="color: var(--text-secondary); line-height: 1.6;">
+                    <li><strong>Basic Commands:</strong> init, clone, add, commit, status</li>
+                    <li><strong>Branching:</strong> branch, checkout, merge, rebase</li>
+                    <li><strong>Remote Operations:</strong> push, pull, fetch, remote</li>
+                    <li><strong>History & Logs:</strong> log, diff, blame, show</li>
+                    <li><strong>Advanced:</strong> stash, cherry-pick, reflog, tags</li>
+                    <li><strong>Configuration:</strong> config, aliases, gitignore</li>
+                    <li><strong>Troubleshooting:</strong> reset, clean, fsck, gc</li>
+                </ul>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="color: var(--accent-primary);">🧭 Navigation</h3>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html" style="color: var(--accent-primary); text-decoration: none; padding: 8px 16px; border: 1px solid var(--accent-primary); border-radius: 4px;">Create Cards</a>
+                    <a href="manage.html" style="color: var(--accent-primary); text-decoration: none; padding: 8px 16px; border: 1px solid var(--accent-primary); border-radius: 4px;">Manage Cards</a>
+                    <a href="learn.html" style="color: var(--accent-primary); text-decoration: none; padding: 8px 16px; border: 1px solid var(--accent-primary); border-radius: 4px;">Learn Cards</a>
+                    <a href="review.html" style="color: var(--accent-primary); text-decoration: none; padding: 8px 16px; border: 1px solid var(--accent-primary); border-radius: 4px;">Review Cards</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function importGitDeck() {
+            const statusDiv = document.getElementById('status');
+            const importBtn = document.getElementById('importBtn');
+            
+            try {
+                statusDiv.innerHTML = '🔄 Loading Git commands deck...';
+                statusDiv.style.backgroundColor = 'var(--status-info)';
+                statusDiv.style.color = 'white';
+                importBtn.disabled = true;
+                
+                // Fetch the Git commands deck
+                const response = await fetch('public_data/git_commands.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to load deck: ${response.status}`);
+                }
+                
+                const deckData = await response.json();
+                
+                statusDiv.innerHTML = '🔄 Initializing database...';
+                
+                // Initialize database
+                await MimirDB.init();
+                
+                statusDiv.innerHTML = '🔄 Importing Git commands...';
+                let importedCount = 0;
+                
+                // Import each card
+                for (const cardData of deckData.cards) {
+                    const card = {
+                        card_id: `git_${Date.now()}_${importedCount}`,
+                        prompt: cardData.prompt,
+                        response: cardData.response,
+                        tags: cardData.tags,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    // Initialize with scheduler
+                    const initializedCard = SpacedRepetitionScheduler.initializeCard(card);
+                    
+                    // Save to database
+                    await MimirDB.saveCard(initializedCard);
+                    importedCount++;
+                    
+                    // Update progress
+                    if (importedCount % 10 === 0) {
+                        statusDiv.innerHTML = `🔄 Imported ${importedCount}/${deckData.cards.length} Git commands...`;
+                    }
+                }
+                
+                statusDiv.innerHTML = `✅ Successfully imported ${importedCount} Git commands!<br>
+                    <small style="display: block; margin-top: 10px;">
+                        🎯 Go to <strong>Manage</strong> → Find the <strong>"git"</strong> deck → Click <strong>"Learn"</strong> to start!<br>
+                        💡 Perfect for mastering Git version control step by step.
+                    </small>`;
+                statusDiv.style.backgroundColor = 'var(--status-success)';
+                statusDiv.style.color = 'white';
+                
+            } catch (error) {
+                console.error('Import failed:', error);
+                statusDiv.innerHTML = `❌ Import failed: ${error.message}<br>
+                    <small>Make sure the server is running and the file exists.</small>`;
+                statusDiv.style.backgroundColor = 'var(--status-error)';
+                statusDiv.style.color = 'white';
+            } finally {
+                importBtn.disabled = false;
+            }
+        }
+
+        async function clearDatabase() {
+            if (confirm('⚠️ Are you sure you want to delete ALL cards?\n\nThis will permanently remove all your flashcards and cannot be undone.')) {
+                const statusDiv = document.getElementById('status');
+                try {
+                    statusDiv.innerHTML = '🔄 Clearing database...';
+                    statusDiv.style.backgroundColor = 'var(--status-warning)';
+                    statusDiv.style.color = 'white';
+                    
+                    await MimirDB.init();
+                    const allCards = await MimirDB.getAllCards();
+                    
+                    for (const card of allCards) {
+                        await MimirDB.deleteCard(card.card_id);
+                    }
+                    
+                    statusDiv.innerHTML = `✅ Cleared ${allCards.length} cards from database.<br>
+                        <small>Database is now empty and ready for new imports.</small>`;
+                    statusDiv.style.backgroundColor = 'var(--status-success)';
+                    statusDiv.style.color = 'white';
+                } catch (error) {
+                    console.error('Clear failed:', error);
+                    statusDiv.innerHTML = `❌ Clear failed: ${error.message}`;
+                    statusDiv.style.backgroundColor = 'var(--status-error)';
+                    statusDiv.style.color = 'white';
+                }
+            }
+        }
+
+        // Add some visual feedback on page load
+        window.addEventListener('load', () => {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `🎯 Ready to import <strong>95 Git commands</strong>!<br>
+                <small>Click the button above to add them to your learning deck.</small>`;
+        });
+    </script>
+</body>
+</html>
