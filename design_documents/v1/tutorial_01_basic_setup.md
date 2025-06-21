@@ -21,17 +21,13 @@ mkdir mimir
 cd mimir
 ```
 
-2. **Initialize npm and install Dexie:**
+2. **Create basic project files:**
 ```bash
-# Initialize npm project
-npm init -y
-
-# Install Dexie as a dependency
-npm install dexie
-
-# Create .gitignore to exclude node_modules
+# Create .gitignore (optional, for future use)
 echo "node_modules/" > .gitignore
 ```
+
+Note: We're using CDN loading for Dexie instead of npm installation to keep the setup simple and avoid the need for a build process.
 
 3. **Create `index.html`:**
 ```html:index.html
@@ -40,21 +36,20 @@ echo "node_modules/" > .gitignore
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mimir v1 - Setup</title>
+    <title>Mimir v1</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/dexie@4.0.11/dist/dexie.js"></script>
 </head>
 <body>
     <div id="app">
         <header>
             <h1>Mimir v1</h1>
-            <p>Project Setup Complete</p>
+            <p>Learning Tool - Cards & Decks</p>
         </header>
         <main>
             <p id="status">App loaded successfully!</p>
         </main>
     </div>
-    <!-- Load Dexie from node_modules -->
-    <script src="node_modules/dexie/dist/dexie.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
@@ -135,24 +130,28 @@ document.addEventListener('DOMContentLoaded', function() {
 ## How to Test
 
 1. **Start a local development server:**
-In package.json, add a script:
-```json
-  "scripts": {
-    "dev": "python -m http.server 8000"
-  },
-```
-Then run:
+Since we're using CDN loading, you can use any simple HTTP server:
+
+**Option 1 - Python (if you have Python installed):**
 ```bash
-npm run dev
+python -m http.server 8000
 ```
 
+**Option 2 - Node.js (if you have Node.js installed):**
+```bash
+npx http-server -p 8000
+```
+
+**Option 3 - VS Code Live Server extension:**
+Right-click on index.html and select "Open with Live Server"
+
 2. **Open your browser and navigate to:**
-   - `http://localhost:8000` (Python server)
-   - Whatever URL your serve command shows (Node.js)
+   - `http://localhost:8000` (Python or http-server)
+   - Whatever URL your development server shows
 
 3. **Verify everything works:**
    - [ ] Page loads without errors
-   - [ ] You see "Mimir v1 - Setup" as the title
+   - [ ] You see "Mimir v1" as the title
    - [ ] Status message shows "Setup complete! Dexie ready for development."
    - [ ] Open browser dev tools (F12) and check Console
    - [ ] Should see: "Mimir v1 starting..." and "Dexie loaded successfully"
@@ -174,15 +173,17 @@ npm run dev
 
 **Why We Did It This Way:**
 
-1. **File Structure:** Separating CSS, JS, and libraries keeps code organized and makes it easier to find things as the project grows.
+1. **CDN Loading:** Using unpkg.com CDN for Dexie eliminates the need for npm/build tools and makes the setup simpler. The specific version (4.0.11) ensures consistency.
 
-2. **Local Server:** Even though it's just static files, using a local server prevents CORS issues when we start loading external resources and simulates how the app will work when deployed.
+2. **File Structure:** Separating CSS, JS, and libraries keeps code organized and makes it easier to find things as the project grows.
 
-3. **Dexie Integration:** Loading it first and testing that it's available prevents hard-to-debug issues later. The console logging gives us immediate feedback.
+3. **Local Server:** Even though it's just static files, using a local server prevents CORS issues when we start loading external resources and simulates how the app will work when deployed.
 
-4. **Semantic HTML:** Using `<header>`, `<main>`, and proper structure makes the code more readable and accessible.
+4. **Dexie Integration:** Loading it in the `<head>` ensures it's available when our script runs. The console logging gives us immediate feedback.
 
-5. **CSS Reset:** The `* { box-sizing: border-box }` and margin/padding reset prevents unexpected layout issues across different browsers.
+5. **Semantic HTML:** Using `<header>`, `<main>`, and proper structure makes the code more readable and accessible.
+
+6. **CSS Reset:** The `* { box-sizing: border-box }` and margin/padding reset prevents unexpected layout issues across different browsers.
 
 **Key Concepts Introduced:**
 - **Single Page Application (SPA) structure:** One HTML file that we'll enhance with JavaScript
@@ -190,27 +191,16 @@ npm run dev
 - **Local Development Workflow:** Test locally, then deploy
 - **Dependency Management:** Loading and verifying external libraries
 
-## Key Changes from Previous Versions
-
-1. **Proper npm workflow:** Using `npm install dexie` instead of manual download
-2. **Correct file path:** Loading Dexie from `node_modules/dexie/dist/dexie.min.js`
-3. **Git ignore:** Properly excluding `node_modules/` from version control
-4. **Removed lib folder:** No longer needed since we're using npm
-
 ### Project Structure After Step 1
 ```
 mimir/
 ├── .gitignore
-├── package.json
-├── package-lock.json
-├── node_modules/
-│   └── dexie/
 ├── index.html
 ├── style.css
 └── script.js
 ```
 
-This approach follows modern web development practices and makes dependency management much easier as your project grows!
+This approach prioritizes simplicity and quick setup while still following modern web development practices!
 
 **Next Step Preview:** In Step 2, we'll add the basic HTML structure and styling, building on this solid foundation.
 
