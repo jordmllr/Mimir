@@ -6,7 +6,6 @@ Minimalist single page app using dexie for local storage via indexedDB.
 
 # User Stories
 ## I can create cards and organize them into decks
-see tutorial_01_cards_and_decks.md for details
 ## I can learn new cards/decks and graduate cards to my spaced repetition deck
 ## I can review cards on a schedule that makes reviews mostly (>=85%) successful
 ## I can edit cards and decks

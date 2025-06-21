@@ -13,9 +13,44 @@
             <h1>Mimir v1</h1>
             <p>Learning Tool - Cards & Decks</p>
         </header>
-        <main>
-            <p id="status">App loaded successfully!</p>
-        </main>
+            <main>
+            <!-- Deck Selection View -->
+            <div id="deck-view" class="view">
+                <h2>Your Decks</h2>
+                <div id="deck-list"></div>
+                <button id="new-deck-btn">Create New Deck</button>
+            </div>
+
+            <!-- Deck Creation Form -->
+            <div id="deck-form-view" class="view hidden">
+                <h2>Create New Deck</h2>
+                <form id="deck-form">
+                <input type="text" id="deck-name" placeholder="Deck Name" required>
+                <textarea id="deck-description" placeholder="Description (optional)"></textarea>
+                <button type="submit">Create Deck</button>
+                <button type="button" id="cancel-deck">Cancel</button>
+                </form>
+            </div>
+
+            <!-- Card Management View -->
+            <div id="card-view" class="view hidden">
+                <h2 id="current-deck-name">Deck Name</h2>
+                <div id="card-list"></div>
+                <button id="new-card-btn">Add New Card</button>
+                <button id="back-to-decks">Back to Decks</button>
+            </div>
+
+            <!-- Card Creation/Edit Form -->
+            <div id="card-form-view" class="view hidden">
+                <h2 id="card-form-title">Add New Card</h2>
+                <form id="card-form">
+                <textarea id="card-prompt" placeholder="Prompt" required></textarea>
+                <textarea id="card-response" placeholder="Response" required></textarea>
+                <button type="submit" id="card-submit">Add Card</button>
+                <button type="button" id="cancel-card">Cancel</button>
+                </form>
+            </div>
+            </main>
     </div>
     <script src="script.js"></script>
 </body>

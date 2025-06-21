@@ -37,11 +37,90 @@ header p {
     font-size: 0.9em;
 }
 
-#status {
-    color: #28a745;
-    font-weight: bold;
-    text-align: center;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 5px;
+
+
+.view {
+  display: block;
+}
+
+.view.hidden {
+  display: none;
+}
+
+/* Form styling */
+form {
+  max-width: 500px;
+  margin: 20px auto;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+button[type="button"] {
+  background: #6c757d;
+}
+
+button[type="button"]:hover {
+  background: #545b62;
+}
+
+/* List styling */
+.deck-item, .card-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.deck-item h3, .card-item h4 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+}
+
+.deck-item p {
+  color: #6c757d;
+  margin: 5px 0;
+}
+
+.card-actions, .deck-actions {
+  margin-top: 10px;
+}
+
+.card-actions button, .deck-actions button {
+  font-size: 14px;
+  padding: 5px 10px;
+}
+
+.delete-btn {
+  background: #dc3545;
+}
+
+.delete-btn:hover {
+  background: #c82333;
 }
