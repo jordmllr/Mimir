@@ -124,3 +124,110 @@ button[type="button"]:hover {
 .delete-btn:hover {
   background: #c82333;
 }
+
+/* Review Section Styling */
+.review-section {
+  background: #e8f4fd;
+  border: 1px solid #bee5eb;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.review-summary p {
+  margin: 5px 0;
+  color: #0c5460;
+}
+
+.review-actions {
+  margin-top: 10px;
+}
+
+.review-actions button {
+  margin: 5px 5px 5px 0;
+  font-size: 14px;
+}
+
+.review-actions button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Review Session Styling */
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.review-progress {
+  font-weight: bold;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.exit-btn {
+  background: #6c757d;
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+.exit-btn:hover {
+  background: #545b62;
+}
+
+.review-card {
+  background: white;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  min-height: 200px;
+}
+
+.review-prompt, .review-response {
+  margin: 15px 0;
+}
+
+.review-prompt h3, .review-response h3 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.review-prompt p, .review-response p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.review-controls {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.review-controls button {
+  font-size: 16px;
+  padding: 12px 24px;
+  margin: 0 10px;
+}
+
+.correct-btn {
+  background: #28a745;
+}
+
+.correct-btn:hover {
+  background: #218838;
+}
+
+.incorrect-btn {
+  background: #dc3545;
+}
+
+.incorrect-btn:hover {
+  background: #c82333;
+}

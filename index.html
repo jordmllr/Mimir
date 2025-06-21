@@ -35,6 +35,10 @@
             <!-- Card Management View -->
             <div id="card-view" class="view hidden">
                 <h2 id="current-deck-name">Deck Name</h2>
+
+                <!-- Review Information Section -->
+                <div id="review-info" class="review-section"></div>
+
                 <div id="card-list"></div>
                 <button id="new-card-btn">Add New Card</button>
                 <button id="back-to-decks">Back to Decks</button>
@@ -49,6 +53,35 @@
                 <button type="submit" id="card-submit">Add Card</button>
                 <button type="button" id="cancel-card">Cancel</button>
                 </form>
+            </div>
+
+            <!-- Review Session View -->
+            <div id="review-session-view" class="view hidden">
+                <div class="review-header">
+                    <div id="review-progress" class="review-progress"></div>
+                    <button onclick="exitSession()" class="exit-btn">Exit Session</button>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-prompt">
+                        <h3>Question:</h3>
+                        <p id="review-prompt-text"></p>
+                    </div>
+
+                    <div class="review-response" id="review-response" style="display: none;">
+                        <h3>Answer:</h3>
+                        <p id="review-response-text"></p>
+                    </div>
+                </div>
+
+                <div class="review-controls">
+                    <button id="show-answer-btn" onclick="showAnswer()">Show Answer</button>
+
+                    <div id="review-buttons" style="display: none;">
+                        <button onclick="answerIncorrect()" class="incorrect-btn">Incorrect</button>
+                        <button onclick="answerCorrect()" class="correct-btn">Correct</button>
+                    </div>
+                </div>
             </div>
             </main>
     </div>

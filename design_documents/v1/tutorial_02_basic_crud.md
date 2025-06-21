@@ -623,11 +623,14 @@ By the end of this tutorial, you should have:
 ## Next Tutorial Preview
 
 Tutorial 03 will focus on improving the user experience with:
-- Better form validation and error messages
-- Improved styling and responsive design
-- Search and filtering capabilities
-- Bulk operations (import/export)
-- Basic spaced repetition scheduling
+- Basic Spacing and Scheduling
+  - database updates (new version for IndexedDB)
+    - card mode (learn or retain)
+    - due date
+    - review history
+  - scheduler
+    - learning mode scheduler: if correct once, show in 20s; if second correct, graduate to retain
+    - retain mode scheduler: 2^n scheduler. retention mode starts with n at 0. n is retrieved from review history as number correct.
 
 ## Questions for Future Development
 
