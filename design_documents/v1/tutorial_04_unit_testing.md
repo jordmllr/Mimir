@@ -3,27 +3,31 @@
 ## Overview
 Now that we have a fully functional spaced repetition app with basic text inputs and review functionality, it's time to implement comprehensive unit tests. This tutorial will guide you through setting up a testing framework and writing tests for all core components to provide regression protection as we continue development.
 
+**Key Principle**: Our tests validate the actual production modules used by script.js, ensuring that our test coverage directly protects the code that runs in the application.
+
 ## Why Unit Testing?
 - **Regression Protection**: Catch bugs when making changes
 - **Documentation**: Tests serve as living documentation of expected behavior
 - **Confidence**: Make changes knowing tests will catch issues
 - **Refactoring Safety**: Safely improve code structure
 - **Edge Case Coverage**: Test boundary conditions and error scenarios
+- **Production Code Validation**: Tests run against the same modules used in the application
 
 ## Testing Strategy
 
 ### What We'll Test
-1. **ReviewScheduler Module**: Core scheduling logic
-2. **ReviewSession Module**: Session management and state
-3. **Database Operations**: CRUD operations for decks and cards
+1. **ReviewScheduler Module**: Core scheduling logic (imported by script.js)
+2. **ReviewSession Module**: Session management and state (imported by script.js)
+3. **Database Operations**: CRUD operations for decks and cards (imported by script.js)
 4. **Review Logic**: Learning, retention, and blitz mode behaviors
-5. **Data Migration**: Schema upgrade functionality
+5. **Integration Workflows**: End-to-end component interactions
 
 ### Testing Approach
-- **Unit Tests**: Test individual functions in isolation
-- **Integration Tests**: Test component interactions
+- **Unit Tests**: Test individual functions in isolation using production modules
+- **Integration Tests**: Test component interactions using the same imports as script.js
 - **Mock Database**: Use in-memory database for consistent test state
 - **Async Testing**: Handle promises and database operations properly
+- **Production Module Testing**: Import and test the exact same modules used by script.js
 
 ## Step 1: Testing Framework Setup
 
@@ -92,663 +96,188 @@ beforeEach(() => {
 })
 ```
 
-## Step 2: Refactor Code for Testability
+## Step 2: Production Module Architecture
 
-Before writing tests, we need to make our code more testable by extracting modules and reducing global dependencies.
+Our application already uses a modular architecture where script.js imports tested modules. This ensures our tests validate the actual production code:
 
-### Extract ReviewScheduler Module
+### Current Module Structure
 
-Create `src/reviewScheduler.js`:
+**script.js imports:**
 ```javascript
-export const ReviewScheduler = {
-  // Graduate card from learning to retention mode
-  graduateCard(card) {
-    const graduatedCard = { ...card }
-    graduatedCard.mode = 'retaining'
-    graduatedCard.due_date = new Date(Date.now() + (24 * 60 * 60 * 1000))
-    return graduatedCard
-  },
-
-  // Retention mode: 2^n days where n = number of correct reviews
-  scheduleRetainCard(card, isCorrect) {
-    const updatedCard = { ...card }
-    const now = new Date()
-    const reviewEntry = {
-      timestamp: now,
-      correct: isCorrect
-    }
-
-    if (!updatedCard.review_history) updatedCard.review_history = []
-    updatedCard.review_history.push(reviewEntry)
-
-    if (isCorrect) {
-      const correctCount = updatedCard.review_history.filter(entry => entry.correct).length
-      const daysToAdd = Math.pow(2, correctCount - 1)
-      updatedCard.due_date = new Date(now.getTime() + (daysToAdd * 24 * 60 * 60 * 1000))
-    } else {
-      updatedCard.due_date = now
-    }
-
-    return updatedCard
-  },
-
-  // Get cards due for review
-  async getDueCards(db, deckId, mode) {
-    const now = new Date()
-    
-    if (mode === 'retaining') {
-      return await db.cards
-        .where('deck_id').equals(deckId)
-        .and(card => card.mode === 'retaining' && card.due_date <= now)
-        .toArray()
-    } else if (mode === 'learning') {
-      return await db.cards
-        .where('deck_id').equals(deckId)
-        .and(card => card.mode === 'learning')
-        .toArray()
-    }
-    
-    return []
-  },
-
-  // Get due counts for UI display
-  async getDueCounts(db, deckId) {
-    const now = new Date()
-    const allCards = await db.cards.where('deck_id').equals(deckId).toArray()
-    
-    return {
-      learning: allCards.filter(card => card.mode === 'learning').length,
-      retaining: allCards.filter(card => 
-        card.mode === 'retaining' && card.due_date <= now
-      ).length,
-      total: allCards.length
-    }
-  }
-}
+import { MimirDatabase } from './src/database.js';
+import { ReviewScheduler } from './src/reviewScheduler.js';
+import { ReviewSession } from './src/reviewSession.js';
 ```
 
-### Extract Database Operations
+**Key Benefits:**
+- Tests run against the same modules used in production
+- No separate "test-only" implementations that could diverge
+- Refactoring is safe because tests validate actual usage
+- UI logic extends tested base classes (e.g., UIReviewSession extends ReviewSession)
 
-Create `src/database.js`:
+### ReviewScheduler Module (src/reviewScheduler.js)
+
+This module contains the core spaced repetition logic and is imported by both script.js and our tests:
+
+### MimirDatabase Module (src/database.js)
+
+This module handles all database operations and is imported by both script.js and our tests. The production code uses:
+
 ```javascript
-export class MimirDatabase {
+const database = new MimirDatabase();
+const db = database.db; // For backward compatibility
+```
+
+### ReviewSession Module (src/reviewSession.js)
+
+This module manages review sessions and is extended by the UI layer:
+
+```javascript
+// In script.js - UI extends the tested base class
+class UIReviewSession extends ReviewSession {
   constructor() {
-    this.db = new Dexie('MimirDB')
-    this.setupSchema()
+    super(db); // Uses the same database instance
   }
-
-  setupSchema() {
-    // Version 1: Basic schema
-    this.db.version(1).stores({
-      decks: '++id, name, description, created_at, updated_at',
-      cards: '++id, deck_id, prompt, response, created_at, updated_at'
-    })
-
-    // Version 2: Add review fields
-    this.db.version(2).stores({
-      decks: '++id, name, description, created_at, updated_at',
-      cards: '++id, deck_id, prompt, response, mode, due_date, review_history, created_at, updated_at'
-    }).upgrade(tx => {
-      return tx.cards.toCollection().modify(card => {
-        card.mode = 'learning'
-        card.due_date = new Date()
-        card.review_history = []
-      })
-    })
-
-    this.setupHooks()
-  }
-
-  setupHooks() {
-    // Timestamp hooks
-    this.db.decks.hook('creating', (primKey, obj, trans) => {
-      obj.created_at = new Date()
-      obj.updated_at = new Date()
-    })
-
-    this.db.decks.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updated_at = new Date()
-    })
-
-    this.db.cards.hook('creating', (primKey, obj, trans) => {
-      obj.created_at = new Date()
-      obj.updated_at = new Date()
-    })
-
-    this.db.cards.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updated_at = new Date()
-    })
-  }
-
-  // Deck operations
-  async createDeck(name, description) {
-    return await this.db.decks.add({ name, description })
-  }
-
-  async getDeck(id) {
-    return await this.db.decks.get(id)
-  }
-
-  async getAllDecks() {
-    return await this.db.decks.toArray()
-  }
-
-  async updateDeck(id, updates) {
-    return await this.db.decks.update(id, updates)
-  }
-
-  async deleteDeck(id) {
-    await this.db.cards.where('deck_id').equals(id).delete()
-    return await this.db.decks.delete(id)
-  }
-
-  // Card operations
-  async createCard(deckId, prompt, response) {
-    return await this.db.cards.add({
-      deck_id: deckId,
-      prompt,
-      response,
-      mode: 'learning',
-      due_date: new Date(),
-      review_history: []
-    })
-  }
-
-  async getCard(id) {
-    return await this.db.cards.get(id)
-  }
-
-  async getCardsByDeck(deckId) {
-    return await this.db.cards.where('deck_id').equals(deckId).toArray()
-  }
-
-  async updateCard(id, updates) {
-    return await this.db.cards.update(id, updates)
-  }
-
-  async deleteCard(id) {
-    return await this.db.cards.delete(id)
-  }
+  // UI-specific methods that call tested base methods
 }
 ```
+
+**Key Architecture Points:**
+- Base ReviewSession class contains all testable logic
+- UI layer (UIReviewSession) only adds display/interaction logic
+- Tests validate the base class that contains the core functionality
+- Production code uses the same imports as tests
 
 ## Step 3: Core Unit Tests
 
-### Test ReviewScheduler
+Our tests import and validate the exact same modules used by script.js, ensuring complete coverage of production code.
 
-Create `test/reviewScheduler.test.js`:
+### Test ReviewScheduler (test/reviewScheduler.test.js)
+
+**Critical**: This test imports the same module used by script.js:
+
 ```javascript
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ReviewScheduler } from '../src/reviewScheduler.js'
-
-describe('ReviewScheduler', () => {
-  let mockCard
-
-  beforeEach(() => {
-    mockCard = {
-      id: 1,
-      deck_id: 1,
-      prompt: 'Test prompt',
-      response: 'Test response',
-      mode: 'learning',
-      due_date: new Date(),
-      review_history: []
-    }
-  })
-
-  describe('graduateCard', () => {
-    it('should graduate card from learning to retaining mode', () => {
-      const result = ReviewScheduler.graduateCard(mockCard)
-      
-      expect(result.mode).toBe('retaining')
-      expect(result.due_date).toBeInstanceOf(Date)
-      expect(result.due_date.getTime()).toBeGreaterThan(Date.now())
-    })
-
-    it('should not mutate original card', () => {
-      const originalMode = mockCard.mode
-      ReviewScheduler.graduateCard(mockCard)
-      
-      expect(mockCard.mode).toBe(originalMode)
-    })
-
-    it('should schedule for 1 day later', () => {
-      const result = ReviewScheduler.graduateCard(mockCard)
-      const expectedTime = Date.now() + (24 * 60 * 60 * 1000)
-      const timeDiff = Math.abs(result.due_date.getTime() - expectedTime)
-      
-      expect(timeDiff).toBeLessThan(1000) // Within 1 second
-    })
-  })
-
-  describe('scheduleRetainCard', () => {
-    beforeEach(() => {
-      mockCard.mode = 'retaining'
-      mockCard.review_history = []
-    })
-
-    it('should add review entry to history', () => {
-      const result = ReviewScheduler.scheduleRetainCard(mockCard, true)
-      
-      expect(result.review_history).toHaveLength(1)
-      expect(result.review_history[0].correct).toBe(true)
-      expect(result.review_history[0].timestamp).toBeInstanceOf(Date)
-    })
-
-    it('should schedule correctly for first correct review (2^0 = 1 day)', () => {
-      const result = ReviewScheduler.scheduleRetainCard(mockCard, true)
-      const expectedTime = Date.now() + (1 * 24 * 60 * 60 * 1000)
-      const timeDiff = Math.abs(result.due_date.getTime() - expectedTime)
-      
-      expect(timeDiff).toBeLessThan(1000)
-    })
-
-    it('should schedule correctly for second correct review (2^1 = 2 days)', () => {
-      // Add first review
-      mockCard.review_history = [{
-        timestamp: new Date(Date.now() - 86400000), // 1 day ago
-        correct: true
-      }]
-      
-      const result = ReviewScheduler.scheduleRetainCard(mockCard, true)
-      const expectedTime = Date.now() + (2 * 24 * 60 * 60 * 1000)
-      const timeDiff = Math.abs(result.due_date.getTime() - expectedTime)
-      
-      expect(timeDiff).toBeLessThan(1000)
-    })
-
-    it('should schedule for immediate review on incorrect answer', () => {
-      const result = ReviewScheduler.scheduleRetainCard(mockCard, false)
-      
-      expect(result.due_date.getTime()).toBeLessThanOrEqual(Date.now())
-    })
-
-    it('should not mutate original card', () => {
-      const originalHistoryLength = mockCard.review_history.length
-      ReviewScheduler.scheduleRetainCard(mockCard, true)
-      
-      expect(mockCard.review_history).toHaveLength(originalHistoryLength)
-    })
-  })
-})
+import { ReviewScheduler } from '../src/reviewScheduler.js' // Same import as script.js
 ```
 
-  })
-})
+The tests validate all the core scheduling logic that script.js relies on:
+- Card graduation from learning to retention mode
+- Exponential scheduling (2^n days) for spaced repetition
+- Immediate rescheduling for incorrect answers
+- Due card filtering and counting
+
+**Key Test Coverage:**
+- `graduateCard()` - Used when cards complete learning mode
+- `scheduleRetainCard()` - Used for all retention mode reviews
+- `getDueCards()` - Used to populate review sessions
+- `getDueCounts()` - Used for UI display of review options
+
+### Test Database Operations (test/database.test.js)
+
+**Critical**: This test imports the same module used by script.js:
+
+```javascript
+import { describe, it, expect, beforeEach } from 'vitest'
+import { MimirDatabase } from '../src/database.js' // Same import as script.js
 ```
 
-### Test Database Operations
+The tests validate all database operations that script.js relies on:
+- Deck CRUD operations with automatic timestamps
+- Card CRUD operations with learning mode defaults
+- Cascade deletion (deleting deck removes all cards)
+- Schema versioning and migration
+- Database hooks for timestamp management
 
-Create `test/database.test.js`:
+**Key Test Coverage:**
+- All methods called by script.js: `createDeck()`, `getDeck()`, `getAllDecks()`, etc.
+- Database schema integrity and migrations
+- Automatic timestamp handling via Dexie hooks
+- Foreign key relationships and cascade operations
+
+**Production Validation:**
+The tests use the exact same MimirDatabase class that script.js instantiates:
+```javascript
+// In script.js
+const database = new MimirDatabase();
+
+// In tests
+db = new MimirDatabase(); // Same class, same behavior
+```
+
+## Step 4: Review Session Testing (test/reviewSession.test.js)
+
+**Critical**: This test imports the same module used by script.js:
+
 ```javascript
 import { describe, it, expect, beforeEach } from 'vitest'
 import { MimirDatabase } from '../src/database.js'
-
-describe('MimirDatabase', () => {
-  let db
-
-  beforeEach(async () => {
-    db = new MimirDatabase()
-    await db.db.open()
-  })
-
-  describe('Deck Operations', () => {
-    it('should create a deck with timestamps', async () => {
-      const deckId = await db.createDeck('Test Deck', 'Test Description')
-      const deck = await db.getDeck(deckId)
-
-      expect(deck.name).toBe('Test Deck')
-      expect(deck.description).toBe('Test Description')
-      expect(deck.created_at).toBeInstanceOf(Date)
-      expect(deck.updated_at).toBeInstanceOf(Date)
-    })
-
-    it('should retrieve all decks', async () => {
-      await db.createDeck('Deck 1', 'Description 1')
-      await db.createDeck('Deck 2', 'Description 2')
-
-      const decks = await db.getAllDecks()
-      expect(decks).toHaveLength(2)
-    })
-
-    it('should update deck timestamps on modification', async () => {
-      const deckId = await db.createDeck('Original Name', 'Original Description')
-      const originalDeck = await db.getDeck(deckId)
-
-      // Wait a bit to ensure timestamp difference
-      await new Promise(resolve => setTimeout(resolve, 10))
-
-      await db.updateDeck(deckId, { name: 'Updated Name' })
-      const updatedDeck = await db.getDeck(deckId)
-
-      expect(updatedDeck.name).toBe('Updated Name')
-      expect(updatedDeck.updated_at.getTime()).toBeGreaterThan(originalDeck.updated_at.getTime())
-    })
-
-    it('should delete deck and cascade delete cards', async () => {
-      const deckId = await db.createDeck('Test Deck', 'Test Description')
-      await db.createCard(deckId, 'Test Prompt', 'Test Response')
-
-      await db.deleteDeck(deckId)
-
-      const deck = await db.getDeck(deckId)
-      const cards = await db.getCardsByDeck(deckId)
-
-      expect(deck).toBeUndefined()
-      expect(cards).toHaveLength(0)
-    })
-  })
-
-  describe('Card Operations', () => {
-    let deckId
-
-    beforeEach(async () => {
-      deckId = await db.createDeck('Test Deck', 'Test Description')
-    })
-
-    it('should create card with default learning mode', async () => {
-      const cardId = await db.createCard(deckId, 'Test Prompt', 'Test Response')
-      const card = await db.getCard(cardId)
-
-      expect(card.prompt).toBe('Test Prompt')
-      expect(card.response).toBe('Test Response')
-      expect(card.mode).toBe('learning')
-      expect(card.due_date).toBeInstanceOf(Date)
-      expect(card.review_history).toEqual([])
-    })
-
-    it('should retrieve cards by deck', async () => {
-      await db.createCard(deckId, 'Prompt 1', 'Response 1')
-      await db.createCard(deckId, 'Prompt 2', 'Response 2')
-
-      const cards = await db.getCardsByDeck(deckId)
-      expect(cards).toHaveLength(2)
-    })
-
-    it('should update card review data', async () => {
-      const cardId = await db.createCard(deckId, 'Test Prompt', 'Test Response')
-
-      await db.updateCard(cardId, {
-        mode: 'retaining',
-        review_history: [{ timestamp: new Date(), correct: true }]
-      })
-
-      const updatedCard = await db.getCard(cardId)
-      expect(updatedCard.mode).toBe('retaining')
-      expect(updatedCard.review_history).toHaveLength(1)
-    })
-  })
-
-  describe('Schema Migration', () => {
-    it('should migrate cards to have review fields', async () => {
-      // This test would be more complex in a real scenario
-      // For now, we verify that new cards have the expected structure
-      const deckId = await db.createDeck('Test Deck', 'Test Description')
-      const cardId = await db.createCard(deckId, 'Test Prompt', 'Test Response')
-      const card = await db.getCard(cardId)
-
-      expect(card).toHaveProperty('mode')
-      expect(card).toHaveProperty('due_date')
-      expect(card).toHaveProperty('review_history')
-    })
-  })
-})
+import { ReviewSession } from '../src/reviewSession.js' // Same import as script.js
 ```
 
-## Step 4: Review Session Testing
+**Key Architecture Point**: The tests validate the base ReviewSession class that UIReviewSession extends in script.js:
 
-Create `test/reviewSession.test.js`:
 ```javascript
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { MimirDatabase } from '../src/database.js'
-
-// Mock ReviewSession class (extracted from script.js)
-class ReviewSession {
-  constructor(db) {
-    this.db = db
-    this.cards = []
-    this.currentIndex = 0
-    this.mode = null
-    this.deckId = null
-    this.showingAnswer = false
-    this.sessionProgress = new Map()
+// In script.js - UI extends the tested base class
+class UIReviewSession extends ReviewSession {
+  constructor() {
+    super(db); // Calls the tested constructor
   }
 
   async start(deckId, mode) {
-    this.deckId = deckId
-    this.mode = mode
-    this.currentIndex = 0
-    this.showingAnswer = false
-    this.sessionProgress.clear()
-
-    if (mode === 'blitz') {
-      this.cards = await this.db.getCardsByDeck(deckId)
-      this.cards.forEach(card => this.sessionProgress.set(card.id, 0))
-    } else if (mode === 'learning') {
-      const allCards = await this.db.getCardsByDeck(deckId)
-      this.cards = allCards.filter(card => card.mode === 'learning')
-      this.cards.forEach(card => this.sessionProgress.set(card.id, 0))
-    }
-
-    return this.cards.length > 0
-  }
-
-  getCurrentCard() {
-    return this.cards[this.currentIndex]
-  }
-
-  updateProgress(cardId, isCorrect) {
-    const current = this.sessionProgress.get(cardId) || 0
-    if (isCorrect) {
-      this.sessionProgress.set(cardId, current + 1)
-    } else {
-      this.sessionProgress.set(cardId, 0)
-    }
-  }
-
-  isCardMastered(cardId) {
-    return (this.sessionProgress.get(cardId) || 0) >= 2
-  }
-
-  areAllCardsMastered() {
-    return Array.from(this.sessionProgress.values()).every(count => count >= 2)
+    const success = await super.start(deckId, mode); // Calls tested method
+    // UI-specific logic here
   }
 }
-
-describe('ReviewSession', () => {
-  let db, session, deckId
-
-  beforeEach(async () => {
-    db = new MimirDatabase()
-    await db.db.open()
-    session = new ReviewSession(db)
-    deckId = await db.createDeck('Test Deck', 'Test Description')
-  })
-
-  describe('Session Initialization', () => {
-    it('should start blitz session with all cards', async () => {
-      await db.createCard(deckId, 'Prompt 1', 'Response 1')
-      await db.createCard(deckId, 'Prompt 2', 'Response 2')
-
-      const success = await session.start(deckId, 'blitz')
-
-      expect(success).toBe(true)
-      expect(session.cards).toHaveLength(2)
-      expect(session.mode).toBe('blitz')
-      expect(session.sessionProgress.size).toBe(2)
-    })
-
-    it('should start learning session with only learning cards', async () => {
-      const card1Id = await db.createCard(deckId, 'Prompt 1', 'Response 1')
-      const card2Id = await db.createCard(deckId, 'Prompt 2', 'Response 2')
-
-      // Graduate one card to retaining mode
-      await db.updateCard(card2Id, { mode: 'retaining' })
-
-      const success = await session.start(deckId, 'learning')
-
-      expect(success).toBe(true)
-      expect(session.cards).toHaveLength(1)
-      expect(session.cards[0].id).toBe(card1Id)
-    })
-
-    it('should fail to start session with no cards', async () => {
-      const success = await session.start(deckId, 'learning')
-
-      expect(success).toBe(false)
-    })
-  })
-
-  describe('Progress Tracking', () => {
-    beforeEach(async () => {
-      await db.createCard(deckId, 'Prompt 1', 'Response 1')
-      await session.start(deckId, 'blitz')
-    })
-
-    it('should track correct answers', () => {
-      const card = session.getCurrentCard()
-
-      session.updateProgress(card.id, true)
-      expect(session.sessionProgress.get(card.id)).toBe(1)
-
-      session.updateProgress(card.id, true)
-      expect(session.sessionProgress.get(card.id)).toBe(2)
-    })
-
-    it('should reset progress on incorrect answer', () => {
-      const card = session.getCurrentCard()
-
-      session.updateProgress(card.id, true)
-      session.updateProgress(card.id, false)
-
-      expect(session.sessionProgress.get(card.id)).toBe(0)
-    })
-
-    it('should identify mastered cards', () => {
-      const card = session.getCurrentCard()
-
-      expect(session.isCardMastered(card.id)).toBe(false)
-
-      session.updateProgress(card.id, true)
-      session.updateProgress(card.id, true)
-
-      expect(session.isCardMastered(card.id)).toBe(true)
-    })
-
-    it('should detect when all cards are mastered', () => {
-      const card = session.getCurrentCard()
-
-      expect(session.areAllCardsMastered()).toBe(false)
-
-      session.updateProgress(card.id, true)
-      session.updateProgress(card.id, true)
-
-      expect(session.areAllCardsMastered()).toBe(true)
-    })
-  })
-})
 ```
 
-## Step 5: Integration Tests
+**Test Coverage:**
+- Session initialization for all modes (learning, retention, blitz)
+- Card filtering logic (learning cards only, due cards only, all cards)
+- Progress tracking and mastery detection
+- Session completion logic
+- Card navigation and shuffling
 
-Create `test/integration.test.js`:
+**Production Validation:**
+Every method tested is called by the UI layer:
+- `start()` - Called when user starts a review session
+- `getCurrentCard()` - Called to display current card
+- `updateProgress()` - Called when user answers correctly/incorrectly
+- `isCardMastered()` / `areAllCardsMastered()` - Called to determine session completion
+
+## Step 5: Integration Tests (test/integration.test.js)
+
+**Critical**: Integration tests use the exact same module imports as script.js:
+
 ```javascript
 import { describe, it, expect, beforeEach } from 'vitest'
-import { MimirDatabase } from '../src/database.js'
-import { ReviewScheduler } from '../src/reviewScheduler.js'
+import { MimirDatabase } from '../src/database.js'      // Same as script.js
+import { ReviewScheduler } from '../src/reviewScheduler.js' // Same as script.js
+import { ReviewSession } from '../src/reviewSession.js'     // Same as script.js
+```
 
-describe('Integration Tests', () => {
-  let db, deckId
+**Integration Test Philosophy:**
+These tests validate the complete workflows that script.js orchestrates:
 
-  beforeEach(async () => {
-    db = new MimirDatabase()
-    await db.db.open()
-    deckId = await db.createDeck('Integration Test Deck', 'Test Description')
-  })
+1. **Learning to Retention Workflow**: Tests the exact sequence script.js uses when graduating cards
+2. **Review Session Integration**: Tests how ReviewSession and ReviewScheduler work together
+3. **Cross-Component Data Flow**: Validates data consistency across all modules
 
-  describe('Learning to Retention Workflow', () => {
-    it('should complete full learning to retention cycle', async () => {
-      // Create a learning card
-      const cardId = await db.createCard(deckId, 'Test Prompt', 'Test Response')
-      let card = await db.getCard(cardId)
+**Key Integration Scenarios:**
+- Card creation → Learning mode → Graduation → Retention scheduling
+- Due card retrieval for different review modes
+- Session management with database persistence
+- Review history tracking and exponential scheduling
 
-      expect(card.mode).toBe('learning')
-
-      // Graduate the card
-      const graduatedCard = ReviewScheduler.graduateCard(card)
-      await db.updateCard(cardId, {
-        mode: graduatedCard.mode,
-        due_date: graduatedCard.due_date
-      })
-
-      // Verify graduation
-      card = await db.getCard(cardId)
-      expect(card.mode).toBe('retaining')
-      expect(card.due_date).toBeInstanceOf(Date)
-
-      // Simulate first retention review
-      const reviewedCard = ReviewScheduler.scheduleRetainCard(card, true)
-      await db.updateCard(cardId, {
-        due_date: reviewedCard.due_date,
-        review_history: reviewedCard.review_history
-      })
-
-      // Verify scheduling
-      const finalCard = await db.getCard(cardId)
-      expect(finalCard.review_history).toHaveLength(1)
-      expect(finalCard.review_history[0].correct).toBe(true)
-    })
-  })
-
-  describe('Due Card Retrieval', () => {
-    it('should retrieve correct cards based on mode and due date', async () => {
-      // Create cards in different states
-      const learningCardId = await db.createCard(deckId, 'Learning Card', 'Response')
-
-      const retainingCardId = await db.createCard(deckId, 'Retaining Card', 'Response')
-      await db.updateCard(retainingCardId, {
-        mode: 'retaining',
-        due_date: new Date(Date.now() - 1000) // Due in the past
-      })
-
-      const futureCardId = await db.createCard(deckId, 'Future Card', 'Response')
-      await db.updateCard(futureCardId, {
-        mode: 'retaining',
-        due_date: new Date(Date.now() + 86400000) // Due tomorrow
-      })
-
-      // Test learning cards
-      const learningCards = await ReviewScheduler.getDueCards(db.db, deckId, 'learning')
-      expect(learningCards).toHaveLength(1)
-      expect(learningCards[0].id).toBe(learningCardId)
-
-      // Test retaining cards
-      const retainingCards = await ReviewScheduler.getDueCards(db.db, deckId, 'retaining')
-      expect(retainingCards).toHaveLength(1)
-      expect(retainingCards[0].id).toBe(retainingCardId)
-    })
-  })
-
-  describe('Due Counts Calculation', () => {
-    it('should calculate correct due counts', async () => {
-      // Create test cards
-      await db.createCard(deckId, 'Learning 1', 'Response')
-      await db.createCard(deckId, 'Learning 2', 'Response')
-
-      const retainingId = await db.createCard(deckId, 'Retaining', 'Response')
-      await db.updateCard(retainingId, {
-        mode: 'retaining',
-        due_date: new Date(Date.now() - 1000)
-      })
-
-      const counts = await ReviewScheduler.getDueCounts(db.db, deckId)
-
-      expect(counts.learning).toBe(2)
-      expect(counts.retaining).toBe(1)
-      expect(counts.total).toBe(3)
-    })
-  })
-})
+**Production Workflow Validation:**
+The integration tests mirror the exact workflows in script.js:
+```javascript
+// In script.js - this exact workflow is tested
+const graduatedCard = ReviewScheduler.graduateCard(card);
+await database.updateCard(cardId, {
+  mode: graduatedCard.mode,
+  due_date: graduatedCard.due_date
+});
 ```
 
 ## Step 6: Running Tests
@@ -812,20 +341,38 @@ jobs:
 
 ## Benefits Achieved
 
-With this testing setup, you now have:
+With this production-module testing approach, you now have:
 
-1. **Regression Protection**: Tests catch bugs when making changes
-2. **Documentation**: Tests serve as executable specifications
-3. **Refactoring Confidence**: Safe to improve code structure
-4. **Edge Case Coverage**: Boundary conditions are tested
-5. **Integration Validation**: Component interactions are verified
+1. **True Regression Protection**: Tests validate the exact code used in production
+2. **Refactoring Safety**: Changes to modules are immediately validated by tests
+3. **Documentation**: Tests serve as executable specifications of production behavior
+4. **Architecture Validation**: Tests ensure the module separation works correctly
+5. **Integration Confidence**: Component interactions are tested using production imports
+6. **No Test/Production Divergence**: Impossible for test code to drift from production code
+
+## Key Architecture Benefits
+
+**Production Code Validation**:
+- script.js imports: `import { ReviewScheduler } from './src/reviewScheduler.js'`
+- Tests import: `import { ReviewScheduler } from '../src/reviewScheduler.js'`
+- **Same module, same behavior, guaranteed**
+
+**UI Layer Separation**:
+- Core logic in tested modules (ReviewSession, ReviewScheduler, MimirDatabase)
+- UI logic in script.js extends/uses tested modules
+- Tests validate the foundation that UI depends on
+
+**Refactoring Confidence**:
+- Any change to core modules is immediately validated
+- UI can be refactored knowing the tested foundation is solid
+- Module boundaries are enforced by import structure
 
 ## Next Steps
 
-1. **Add More Test Cases**: Cover remaining edge cases
-2. **Performance Tests**: Test with large datasets
-3. **End-to-End Tests**: Test full user workflows
-4. **Visual Regression Tests**: Test UI components
+1. **UI Logic Testing**: Add tests for script.js UI-specific logic using vitest + jsdom
+2. **End-to-End Tests**: Test complete user workflows
+3. **Performance Tests**: Test with large datasets
+4. **Error Handling**: Test network failures and edge cases
 5. **Accessibility Tests**: Ensure app is accessible
 
-This comprehensive testing foundation will protect your spaced repetition app as it grows and evolves, giving you confidence to add new features and refactor existing code.
+This production-module testing foundation ensures your tests actually protect the code that runs in your application, providing true regression protection as you continue development.
