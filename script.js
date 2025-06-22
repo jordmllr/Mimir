@@ -1,6 +1,11 @@
 // Mimir v1 - Basic Review Functionality
 console.log('Mimir v1 starting...');
 
+// Import our tested modules
+import { MimirDatabase } from './src/database.js';
+import { ReviewScheduler } from './src/reviewScheduler.js';
+import { ReviewSession } from './src/reviewSession.js';
+
 // Test that Dexie loaded
 if (typeof Dexie !== 'undefined') {
     console.log('Dexie loaded successfully');
@@ -9,149 +14,25 @@ if (typeof Dexie !== 'undefined') {
     alert('Error: Dexie library failed to load. Please refresh the page.');
 }
 
-// Database setup with Dexie
-const db = new Dexie('MimirDB');
-
-// Define schema - Version 2 adds review functionality
-db.version(1).stores({
-  decks: '++id, name, description, created_at, updated_at',
-  cards: '++id, deck_id, prompt, response, created_at, updated_at'
-});
-
-// Version 2: Add review fields to cards
-db.version(2).stores({
-  decks: '++id, name, description, created_at, updated_at',
-  cards: '++id, deck_id, prompt, response, mode, due_date, review_history, created_at, updated_at'
-}).upgrade(tx => {
-  // Migrate existing cards to have default review values
-  return tx.cards.toCollection().modify(card => {
-    card.mode = 'learning';
-    card.due_date = new Date(); // Due immediately for review
-    card.review_history = [];
-  });
-});
-
-// Database hooks for timestamps
-db.decks.hook('creating', function (primKey, obj, trans) {
-  obj.created_at = new Date();
-  obj.updated_at = new Date();
-});
-
-db.decks.hook('updating', function (modifications, primKey, obj, trans) {
-  modifications.updated_at = new Date();
-});
-
-db.cards.hook('creating', function (primKey, obj, trans) {
-  obj.created_at = new Date();
-  obj.updated_at = new Date();
-});
-
-db.cards.hook('updating', function (modifications, primKey, obj, trans) {
-  modifications.updated_at = new Date();
-});
+// Initialize our tested database module
+const database = new MimirDatabase();
+const db = database.db; // For backward compatibility with existing code
 
 // Application state
 let currentDeckId = null;
 let currentCardId = null;
 let currentReviewSession = null;
 
-// Review Scheduling Functions
-const ReviewScheduler = {
-  // Graduate card from learning to retention mode
-  graduateCard(card) {
-    card.mode = 'retaining';
-    card.due_date = new Date(Date.now() + (24 * 60 * 60 * 1000)); // Due in 1 day
-    // Don't add to review_history - learning attempts don't count
-    return card;
-  },
-
-  // Retention mode: 2^n days where n = number of correct reviews
-  scheduleRetainCard(card, isCorrect) {
-    const now = new Date();
-    const reviewEntry = {
-      timestamp: now,
-      correct: isCorrect
-    };
-
-    if (!card.review_history) card.review_history = [];
-    card.review_history.push(reviewEntry);
-
-    if (isCorrect) {
-      // Count total correct reviews for this card
-      const correctCount = card.review_history.filter(entry => entry.correct).length;
-      const daysToAdd = Math.pow(2, correctCount - 1); // 2^(n-1) where n is correct count
-      card.due_date = new Date(now.getTime() + (daysToAdd * 24 * 60 * 60 * 1000));
-    } else {
-      // Incorrect - schedule for immediate review but stay in retention mode
-      card.due_date = now;
-    }
-
-    return card;
-  },
-
-  // Get cards due for review
-  async getDueCards(deckId, mode = null) {
-    const now = new Date();
-    let query = db.cards.where('deck_id').equals(deckId).and(card => new Date(card.due_date) <= now);
-
-    if (mode) {
-      query = query.and(card => card.mode === mode);
-    }
-
-    return await query.toArray();
-  },
-
-  // Get count of due cards by mode
-  async getDueCounts(deckId) {
-    const now = new Date();
-
-    // Learning cards are always "due" (no scheduling)
-    const learningCards = await db.cards.where('deck_id').equals(deckId).and(card => card.mode === 'learning').toArray();
-
-    // Retention cards are due based on their due_date
-    const retentionDue = await db.cards.where('deck_id').equals(deckId)
-      .and(card => card.mode === 'retaining' && new Date(card.due_date) <= now).toArray();
-
-    return {
-      learning: learningCards.length,
-      retaining: retentionDue.length,
-      total: learningCards.length + retentionDue.length
-    };
+// UI-specific ReviewSession wrapper that extends our tested ReviewSession class
+class UIReviewSession extends ReviewSession {
+  constructor() {
+    super(db);
   }
-};
-
-// Review Session Management
-const ReviewSession = {
-  cards: [],
-  currentIndex: 0,
-  mode: null, // 'learning', 'retaining', or 'blitz'
-  deckId: null,
-  showingAnswer: false,
-  sessionProgress: new Map(), // For learning/blitz modes: cardId -> consecutive correct count
 
   async start(deckId, mode) {
-    this.deckId = deckId;
-    this.mode = mode;
-    this.currentIndex = 0;
-    this.showingAnswer = false;
-    this.sessionProgress.clear();
+    const success = await super.start(deckId, mode);
 
-    if (mode === 'blitz') {
-      // Blitz mode: get all cards in deck for continuous cycling
-      this.cards = await db.cards.where('deck_id').equals(deckId).toArray();
-      // Initialize session progress tracking
-      this.cards.forEach(card => this.sessionProgress.set(card.id, 0));
-    } else if (mode === 'learning') {
-      // Learning mode: get only cards that are still in learning mode
-      this.cards = await db.cards.where('deck_id').equals(deckId).and(card => card.mode === 'learning').toArray();
-      // Initialize session progress tracking
-      this.cards.forEach(card => this.sessionProgress.set(card.id, 0));
-    } else if (mode === 'retaining') {
-      // Retention mode: get only due cards (traditional spaced repetition)
-      this.cards = await ReviewScheduler.getDueCards(deckId, mode);
-    }
-
-    if (this.cards.length === 0) {
+    if (!success) {
       const message = mode === 'blitz'
         ? 'No cards in this deck!'
         : `No cards ${mode === 'retaining' ? 'due for retention' : 'available for'} review!`;
@@ -159,34 +40,24 @@ const ReviewSession = {
       return false;
     }
 
-    // Shuffle cards for variety
-    this.shuffleCards();
     currentReviewSession = this;
     await this.displayCurrentCard();
     showView('review-session-view');
     return true;
-  },
-
-  shuffleCards() {
-    for (let i = this.cards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
-    }
-  },
+  }
 
   async displayCurrentCard() {
-    if (this.currentIndex >= this.cards.length) {
-      // For continuous modes, check if we need to cycle or end
-      if (this.mode === 'blitz' || this.mode === 'learning') {
-        await this.handleContinuousMode();
-        return;
-      } else {
-        await this.endSession();
-        return;
-      }
+    if (this.isSessionComplete()) {
+      await this.endSession();
+      return;
     }
 
-    const card = this.cards[this.currentIndex];
+    const card = this.getCurrentCard();
+    if (!card) {
+      await this.endSession();
+      return;
+    }
+
     document.getElementById('review-prompt-text').textContent = card.prompt;
     document.getElementById('review-response-text').textContent = card.response;
     document.getElementById('review-response').style.display = 'none';
@@ -197,93 +68,38 @@ const ReviewSession = {
     // Update progress display
     const progress = document.getElementById('review-progress');
     if (this.mode === 'blitz' || this.mode === 'learning') {
-      const completed = Array.from(this.sessionProgress.values()).filter(count => count >= 2).length;
-      const total = this.sessionProgress.size;
-      progress.textContent = `Mastered: ${completed}/${total} | Current: ${this.currentIndex + 1}/${this.cards.length}`;
+      const stats = this.getSessionStats();
+      progress.textContent = `Mastered: ${stats.completed}/${stats.total} | Current: ${this.currentIndex + 1}/${this.cards.length}`;
     } else {
       progress.textContent = `Card ${this.currentIndex + 1} of ${this.cards.length}`;
     }
-  },
-
-  async handleContinuousMode() {
-    // Check if all cards are mastered (2 consecutive correct)
-    const allMastered = Array.from(this.sessionProgress.values()).every(count => count >= 2);
-    if (allMastered) {
-      await this.endSession();
-      return;
-    }
-
-    // Filter out mastered cards and continue with remaining
-    this.cards = this.cards.filter(c => this.sessionProgress.get(c.id) < 2);
-    this.currentIndex = 0;
-    this.shuffleCards();
-    await this.displayCurrentCard();
-  },
+  }
 
   showAnswer() {
     document.getElementById('review-response').style.display = 'block';
     document.getElementById('show-answer-btn').style.display = 'none';
     document.getElementById('review-buttons').style.display = 'block';
     this.showingAnswer = true;
-  },
+  }
 
   async answerCard(isCorrect) {
     if (!this.showingAnswer) return;
 
-    const card = this.cards[this.currentIndex];
+    // Use the parent class's answerCard method which handles all the logic
+    await super.answerCard(isCorrect);
 
-    if (this.mode === 'blitz' || this.mode === 'learning') {
-      // Continuous modes: track consecutive correct answers in session
-      const currentCount = this.sessionProgress.get(card.id) || 0;
-      if (isCorrect) {
-        this.sessionProgress.set(card.id, currentCount + 1);
-      } else {
-        this.sessionProgress.set(card.id, 0); // Reset on incorrect
-      }
-
-      // For learning mode, graduate cards when mastered (but don't update review history)
-      if (this.mode === 'learning') {
-        const masteryCount = this.sessionProgress.get(card.id) || 0;
-        if (isCorrect && masteryCount >= 2) {
-          // Graduate to retention mode
-          let updatedCard = ReviewScheduler.graduateCard(card);
-          await db.cards.update(card.id, {
-            mode: updatedCard.mode,
-            due_date: updatedCard.due_date
-            // Note: review_history is NOT updated for learning attempts
-          });
-        }
-        // Learning cards that aren't graduated don't need database updates
-      }
-
-      // Move to next card
-      this.currentIndex++;
-    } else {
-      // Retention mode: traditional spaced repetition
-      let updatedCard = ReviewScheduler.scheduleRetainCard(card, isCorrect);
-
-      // Save updated card to database
-      await db.cards.update(card.id, {
-        mode: updatedCard.mode,
-        due_date: updatedCard.due_date,
-        review_history: updatedCard.review_history
-      });
-
-      this.currentIndex++;
-    }
-
+    // Update the UI
     await this.displayCurrentCard();
-  },
+  }
 
   async endSession() {
     let message;
     if (this.mode === 'blitz' || this.mode === 'learning') {
-      const completed = Array.from(this.sessionProgress.values()).filter(count => count >= 2).length;
-      const total = this.sessionProgress.size;
-      if (completed === total) {
-        message = `${this.mode === 'blitz' ? 'Blitz' : 'Learning'} session complete! All ${total} cards mastered.`;
+      const stats = this.getSessionStats();
+      if (stats.completed === stats.total) {
+        message = `${this.mode === 'blitz' ? 'Blitz' : 'Learning'} session complete! All ${stats.total} cards mastered.`;
       } else {
-        message = `${this.mode === 'blitz' ? 'Blitz' : 'Learning'} session ended. Mastered ${completed} of ${total} cards.`;
+        message = `${this.mode === 'blitz' ? 'Blitz' : 'Learning'} session ended. Mastered ${stats.completed} of ${stats.total} cards.`;
       }
     } else {
       message = 'Review session complete!';
@@ -294,14 +110,14 @@ const ReviewSession = {
     // Refresh the card view to show updated review info
     await loadCards();
     showView('card-view');
-  },
+  }
 
   async exitSession() {
     if (confirm('Are you sure you want to exit this review session?')) {
       await this.endSession();
     }
   }
-};
+}
 
 // View management
 function showView(viewId) {
@@ -314,15 +130,16 @@ function showView(viewId) {
 // Deck CRUD Operations
 async function loadDecks() {
   try {
-    const decks = await db.decks.orderBy('name').toArray();
+    const decks = await database.getAllDecks();
+    const sortedDecks = decks.sort((a, b) => a.name.localeCompare(b.name));
     const deckList = document.getElementById('deck-list');
-    
-    if (decks.length === 0) {
+
+    if (sortedDecks.length === 0) {
       deckList.innerHTML = '<p>No decks yet. Create your first deck!</p>';
       return;
     }
-    
-    deckList.innerHTML = decks.map(deck => `
+
+    deckList.innerHTML = sortedDecks.map(deck => `
       <div class="deck-item">
         <h3>${deck.name}</h3>
         <p>${deck.description || 'No description'}</p>
@@ -340,10 +157,7 @@ async function loadDecks() {
 
 async function createDeck(name, description) {
   try {
-    await db.decks.add({
-      name: name,
-      description: description
-    });
+    await database.createDeck(name, description);
     console.log('Deck created successfully');
     await loadDecks();
     showView('deck-view');
@@ -356,12 +170,9 @@ async function deleteDeck(deckId) {
   if (!confirm('Are you sure? This will delete the deck and all its cards.')) {
     return;
   }
-  
+
   try {
-    // Delete all cards in the deck first
-    await db.cards.where('deck_id').equals(deckId).delete();
-    // Then delete the deck
-    await db.decks.delete(deckId);
+    await database.deleteDeck(deckId);
     console.log('Deck deleted successfully');
     await loadDecks();
   } catch (error) {
@@ -372,7 +183,7 @@ async function deleteDeck(deckId) {
 async function selectDeck(deckId) {
   currentDeckId = deckId;
   try {
-    const deck = await db.decks.get(deckId);
+    const deck = await database.getDeck(deckId);
     document.getElementById('current-deck-name').textContent = deck.name;
     await loadCards();
     showView('card-view');
@@ -387,8 +198,8 @@ async function loadCards() {
 
   // Load and display due card counts and review options
   try {
-    const dueCounts = await ReviewScheduler.getDueCounts(currentDeckId);
-    const allCards = await db.cards.where('deck_id').equals(currentDeckId).toArray();
+    const dueCounts = await ReviewScheduler.getDueCounts(db, currentDeckId);
+    const allCards = await database.getCardsByDeck(currentDeckId);
     const reviewInfo = document.getElementById('review-info');
 
     reviewInfo.innerHTML = `
@@ -413,7 +224,7 @@ async function loadCards() {
   }
 
   try {
-    const cards = await db.cards.where('deck_id').equals(currentDeckId).toArray();
+    const cards = await database.getCardsByDeck(currentDeckId);
     const cardList = document.getElementById('card-list');
 
     if (cards.length === 0) {
@@ -447,14 +258,7 @@ async function createCard(prompt, response) {
   if (!currentDeckId) return;
 
   try {
-    await db.cards.add({
-      deck_id: currentDeckId,
-      prompt: prompt,
-      response: response,
-      mode: 'learning',
-      due_date: new Date(), // Due immediately for first review
-      review_history: []
-    });
+    await database.createCard(currentDeckId, prompt, response);
     console.log('Card created successfully');
     await loadCards();
     showView('card-view');
@@ -465,7 +269,7 @@ async function createCard(prompt, response) {
 
 async function updateCard(cardId, prompt, response) {
   try {
-    await db.cards.update(cardId, {
+    await database.updateCard(cardId, {
       prompt: prompt,
       response: response
     });
@@ -481,9 +285,9 @@ async function deleteCard(cardId) {
   if (!confirm('Are you sure you want to delete this card?')) {
     return;
   }
-  
+
   try {
-    await db.cards.delete(cardId);
+    await database.deleteCard(cardId);
     console.log('Card deleted successfully');
     await loadCards();
   } catch (error) {
@@ -493,7 +297,7 @@ async function deleteCard(cardId) {
 
 async function editCard(cardId) {
   try {
-    const card = await db.cards.get(cardId);
+    const card = await database.getCard(cardId);
     currentCardId = cardId;
 
     document.getElementById('card-prompt').value = card.prompt;
@@ -513,7 +317,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // Initialize database
   try {
-    await db.open();
+    await database.db.open();
     console.log('Database opened successfully');
     await loadDecks();
   } catch (error) {
@@ -592,7 +396,8 @@ async function startReview(mode) {
 
   try {
     console.log(`Starting ${mode} review for deck ${currentDeckId}`);
-    const success = await ReviewSession.start(currentDeckId, mode);
+    const session = new UIReviewSession();
+    const success = await session.start(currentDeckId, mode);
     if (!success) {
       // No cards available, stay on current view
       console.log(`No cards available for ${mode} review`);
