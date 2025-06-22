@@ -676,15 +676,6 @@ textarea {
   opacity: 0.4;
 }
 
-.review-prompt h3 {
-  color: var(--ink-gray);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-md);
-}
-
 .review-prompt p {
   font-size: var(--text-xl);
   line-height: 1.4;
@@ -713,15 +704,6 @@ textarea {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.review-response h3 {
-  color: var(--ink-gray);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-md);
 }
 
 .review-response p {
