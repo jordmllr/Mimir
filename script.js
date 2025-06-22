@@ -52,18 +52,45 @@ class UIReviewSession extends ReviewSession {
       return;
     }
 
-    const card = this.getCurrentCard();
+    let card = this.getCurrentCard();
     if (!card) {
-      await this.endSession();
-      return;
+      // For blitz/learning mode, if we've run out of cards but not all are mastered,
+      // we need to continue with remaining unmastered cards
+      if (this.mode === 'blitz' || this.mode === 'learning') {
+        const sessionComplete = await this.handleContinuousMode();
+        if (sessionComplete) {
+          await this.endSession();
+          return;
+        }
+        // Get the new current card after filtering
+        card = this.getCurrentCard();
+        if (!card) {
+          await this.endSession();
+          return;
+        }
+      } else {
+        await this.endSession();
+        return;
+      }
     }
 
     document.getElementById('review-prompt-text').textContent = card.prompt;
     document.getElementById('review-response-text').textContent = card.response;
-    document.getElementById('review-response').style.display = 'none';
+    document.getElementById('review-response').classList.remove('revealed');
     document.getElementById('show-answer-btn').style.display = 'block';
     document.getElementById('review-buttons').style.display = 'none';
     this.showingAnswer = false;
+
+    // Add click handler to the card to reveal answer
+    const reviewCard = document.querySelector('.review-card');
+    if (reviewCard) {
+      reviewCard.onclick = () => {
+        if (!this.showingAnswer) {
+          this.showAnswer();
+        }
+      };
+      reviewCard.style.cursor = this.showingAnswer ? 'default' : 'pointer';
+    }
 
     // Update progress display
     const progress = document.getElementById('review-progress');
@@ -76,10 +103,23 @@ class UIReviewSession extends ReviewSession {
   }
 
   showAnswer() {
-    document.getElementById('review-response').style.display = 'block';
+    const responseElement = document.getElementById('review-response');
+    responseElement.classList.add('revealed');
+
     document.getElementById('show-answer-btn').style.display = 'none';
     document.getElementById('review-buttons').style.display = 'block';
     this.showingAnswer = true;
+
+    // Update cursor style
+    const reviewCard = document.querySelector('.review-card');
+    if (reviewCard) {
+      reviewCard.style.cursor = 'default';
+    }
+  }
+
+  async handleContinuousMode() {
+    // Use the parent class method
+    return await super.handleContinuousMode();
   }
 
   async answerCard(isCorrect) {
@@ -135,18 +175,19 @@ async function loadDecks() {
     const deckList = document.getElementById('deck-list');
 
     if (sortedDecks.length === 0) {
-      deckList.innerHTML = '<p>No decks yet. Create your first deck!</p>';
+      deckList.innerHTML = '<p class="empty-state">No decks yet. Create your first deck!</p>';
       return;
     }
 
     deckList.innerHTML = sortedDecks.map(deck => `
-      <div class="deck-item">
-        <h3>${deck.name}</h3>
-        <p>${deck.description || 'No description'}</p>
-        <p><small>Created: ${deck.created_at.toLocaleDateString()}</small></p>
-        <div class="deck-actions">
-          <button onclick="selectDeck(${deck.id})">View Cards</button>
-          <button onclick="deleteDeck(${deck.id})" class="delete-btn">Delete</button>
+      <div class="deck-item ${currentDeckId === deck.id ? 'active' : ''}" onclick="selectDeck(${deck.id})">
+        <div class="deck-header-row">
+          <h3>${deck.name}</h3>
+          <button onclick="event.stopPropagation(); deleteDeck(${deck.id})" class="delete-icon-btn" title="Delete deck">
+            <svg width="16" height="16" viewBox="0 0 109.484 122.88">
+              <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
+            </svg>
+          </button>
         </div>
       </div>
     `).join('');
@@ -186,6 +227,7 @@ async function selectDeck(deckId) {
     const deck = await database.getDeck(deckId);
     document.getElementById('current-deck-name').textContent = deck.name;
     await loadCards();
+    await loadDecks(); // Refresh to update active state
     showView('card-view');
   } catch (error) {
     console.error('Error selecting deck:', error);
@@ -196,27 +238,27 @@ async function selectDeck(deckId) {
 async function loadCards() {
   if (!currentDeckId) return;
 
-  // Load and display due card counts and review options
+  // Load and display due card counts and review options as tiles
   try {
     const dueCounts = await ReviewScheduler.getDueCounts(db, currentDeckId);
     const allCards = await database.getCardsByDeck(currentDeckId);
-    const reviewInfo = document.getElementById('review-info');
+    const reviewTiles = document.getElementById('review-tiles');
 
-    reviewInfo.innerHTML = `
-      <div class="review-summary">
-        <p><strong>Review Options:</strong></p>
-        ${dueCounts.total > 0 ? `<p>Due now - Learning: ${dueCounts.learning} | Retention: ${dueCounts.retaining}</p>` : '<p>No cards due for scheduled review.</p>'}
+    reviewTiles.innerHTML = `
+      <div class="review-tile learning ${dueCounts.learning === 0 ? 'disabled' : ''}"
+           onclick="${dueCounts.learning > 0 ? 'startReview(\'learning\')' : ''}">
+        <h4>Learning Mode</h4>
+        <p>${dueCounts.learning} cards due</p>
       </div>
-      <div class="review-actions">
-        <button onclick="startReview('learning')" ${dueCounts.learning === 0 ? 'disabled' : ''}>
-          Learning Mode (${dueCounts.learning} due)
-        </button>
-        <button onclick="startReview('retaining')" ${dueCounts.retaining === 0 ? 'disabled' : ''}>
-          Retention Mode (${dueCounts.retaining} due)
-        </button>
-        <button onclick="startReview('blitz')" ${allCards.length === 0 ? 'disabled' : ''}>
-          Blitz Mode (${allCards.length} cards)
-        </button>
+      <div class="review-tile retention ${dueCounts.retaining === 0 ? 'disabled' : ''}"
+           onclick="${dueCounts.retaining > 0 ? 'startReview(\'retaining\')' : ''}">
+        <h4>Retention Mode</h4>
+        <p>${dueCounts.retaining} cards due</p>
+      </div>
+      <div class="review-tile blitz ${allCards.length === 0 ? 'disabled' : ''}"
+           onclick="${allCards.length > 0 ? 'startReview(\'blitz\')' : ''}">
+        <h4>Blitz Mode</h4>
+        <p>${allCards.length} total cards</p>
       </div>
     `;
   } catch (error) {
@@ -228,7 +270,7 @@ async function loadCards() {
     const cardList = document.getElementById('card-list');
 
     if (cards.length === 0) {
-      cardList.innerHTML = '<p>No cards yet. Add your first card!</p>';
+      cardList.innerHTML = '<p class="empty-state">No cards yet. Add your first card!</p>';
       return;
     }
 
@@ -239,7 +281,7 @@ async function loadCards() {
 
       return `
         <div class="card-item">
-          <h4>Prompt: ${card.prompt}</h4>
+          <h4>${card.prompt}</h4>
           <p><strong>Response:</strong> ${card.response}</p>
           <p><small>Created: ${card.created_at.toLocaleDateString()} | Mode: ${modeDisplay} | ${dueStatus}</small></p>
           <div class="card-actions">
@@ -320,6 +362,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     await database.db.open();
     console.log('Database opened successfully');
     await loadDecks();
+    showView('deck-view'); // Show deck selection by default
   } catch (error) {
     console.error('Database error:', error);
     alert('Database error: ' + error.message);
@@ -378,10 +421,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     showView('card-view');
   });
 
-  document.getElementById('back-to-decks').addEventListener('click', () => {
-    currentDeckId = null;
-    showView('deck-view');
-  });
+  // Note: back-to-decks button removed in new layout - deck switching handled by sidebar
 
   // App initialization complete
   console.log('App initialization complete');
@@ -432,3 +472,14 @@ async function exitSession() {
     await currentReviewSession.exitSession();
   }
 }
+
+// Make functions globally accessible for HTML onclick handlers
+window.selectDeck = selectDeck;
+window.deleteDeck = deleteDeck;
+window.editCard = editCard;
+window.deleteCard = deleteCard;
+window.startReview = startReview;
+window.showAnswer = showAnswer;
+window.answerCorrect = answerCorrect;
+window.answerIncorrect = answerIncorrect;
+window.exitSession = exitSession;

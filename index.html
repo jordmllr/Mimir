@@ -10,17 +10,25 @@
 </head>
 <body>
     <div id="app">
-        <header>
-            <h1>Mimir v1</h1>
-            <p>Learning Tool - Cards & Decks</p>
-        </header>
-            <main>
-            <!-- Deck Selection View -->
-            <div id="deck-view" class="view">
-                <h2>Your Decks</h2>
-                <div id="deck-list"></div>
-                <button id="new-deck-btn">Create New Deck</button>
-            </div>
+        <div class="app-layout">
+            <!-- Left Sidebar - Deck List -->
+            <aside class="deck-sidebar">
+                <div class="sidebar-header">
+                    <h3>Decks</h3>
+                    <button id="new-deck-btn" class="btn-small">+ New</button>
+                </div>
+                <div id="deck-list" class="deck-list-sidebar"></div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Deck Selection View (hidden when deck is selected) -->
+                <div id="deck-view" class="view">
+                    <div class="welcome-message">
+                        <h2>Select a deck to begin studying</h2>
+                        <p>Choose a deck from the sidebar or create a new one to get started.</p>
+                    </div>
+                </div>
 
             <!-- Deck Creation Form -->
             <div id="deck-form-view" class="view hidden">
@@ -35,14 +43,20 @@
 
             <!-- Card Management View -->
             <div id="card-view" class="view hidden">
-                <h2 id="current-deck-name">Deck Name</h2>
+                <div class="deck-header">
+                    <h2 id="current-deck-name">Deck Name</h2>
 
-                <!-- Review Information Section -->
-                <div id="review-info" class="review-section"></div>
+                    <!-- Review Options as Tiles -->
+                    <div id="review-tiles" class="review-tiles"></div>
+                </div>
 
-                <div id="card-list"></div>
-                <button id="new-card-btn">Add New Card</button>
-                <button id="back-to-decks">Back to Decks</button>
+                <div class="card-management">
+                    <div class="section-header">
+                        <h3>Cards</h3>
+                        <button id="new-card-btn" class="btn-small">+ Add Card</button>
+                    </div>
+                    <div id="card-list"></div>
+                </div>
             </div>
 
             <!-- Card Creation/Edit Form -->
@@ -69,7 +83,7 @@
                         <p id="review-prompt-text"></p>
                     </div>
 
-                    <div class="review-response" id="review-response" style="display: none;">
+                    <div class="review-response" id="review-response">
                         <h3>Answer:</h3>
                         <p id="review-response-text"></p>
                     </div>
@@ -85,6 +99,7 @@
                 </div>
             </div>
             </main>
+        </div>
     </div>
     <script type="module" src="script.js"></script>
 </body>

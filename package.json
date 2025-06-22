@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Spaced repetition flashcard app with learning modes",
   "scripts": {
+    "dev": "python -m http.server 8000",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
