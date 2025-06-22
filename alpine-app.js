@@ -135,6 +135,7 @@ function mimirApp() {
     currentDeckId: null,
     currentCardId: null,
     currentReviewSession: null,
+    mobileMenuOpen: false,
     
     // Data arrays
     decks: [],
@@ -234,6 +235,7 @@ function mimirApp() {
 
     async selectDeck(deckId) {
       this.currentDeckId = deckId;
+      this.mobileMenuOpen = false; // Close mobile menu when deck is selected
       try {
         await this.loadCards();
         await this.loadDecks(); // Refresh to update active state
