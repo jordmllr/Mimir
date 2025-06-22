@@ -7,23 +7,45 @@
     <link rel="icon" type="image/svg+xml" href="mimir_icon.svg">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/dexie@4.0.11/dist/dexie.js"></script>
+    <script type="module" src="alpine-app.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
-    <div id="app">
+    <div id="app" x-data="mimirApp()" x-init="init()"
         <div class="app-layout">
             <!-- Left Sidebar - Deck List -->
             <aside class="deck-sidebar">
                 <div class="sidebar-header">
                     <h3>Decks</h3>
-                    <button id="new-deck-btn" class="btn-small">+ New</button>
+                    <button @click="showView('deck-form')" class="btn-small">+ New</button>
                 </div>
-                <div id="deck-list" class="deck-list-sidebar"></div>
+                <div class="deck-list-sidebar">
+                    <template x-if="decks.length === 0">
+                        <p class="empty-state">No decks yet. Create your first deck!</p>
+                    </template>
+                    <template x-for="deck in decks" :key="deck.id">
+                        <div class="deck-item"
+                             :class="{ 'active': currentDeckId === deck.id }"
+                             @click="selectDeck(deck.id)">
+                            <div class="deck-header-row">
+                                <h3 x-text="deck.name"></h3>
+                                <button @click.stop="deleteDeck(deck.id)"
+                                        class="delete-icon-btn"
+                                        title="Delete deck">
+                                    <svg width="16" height="16" viewBox="0 0 109.484 122.88">
+                                        <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </aside>
 
             <!-- Main Content Area -->
             <main class="main-content">
                 <!-- Deck Selection View (hidden when deck is selected) -->
-                <div id="deck-view" class="view">
+                <div x-show="isViewActive('deck')" class="view">
                     <div class="welcome-message">
                         <h2>Select a deck to begin studying</h2>
                         <p>Choose a deck from the sidebar or create a new one to get started.</p>
@@ -31,74 +53,120 @@
                 </div>
 
             <!-- Deck Creation Form -->
-            <div id="deck-form-view" class="view hidden">
+            <div x-show="isViewActive('deck-form')" class="view">
                 <h2>Create New Deck</h2>
-                <form id="deck-form">
-                <input type="text" id="deck-name" placeholder="Deck Name" required>
-                <textarea id="deck-description" placeholder="Description (optional)"></textarea>
-                <button type="submit">Create Deck</button>
-                <button type="button" id="cancel-deck">Cancel</button>
+                <form @submit.prevent="createDeck()">
+                    <input type="text"
+                           x-model="deckForm.name"
+                           placeholder="Deck Name"
+                           required>
+                    <textarea x-model="deckForm.description"
+                              placeholder="Description (optional)"></textarea>
+                    <button type="submit">Create Deck</button>
+                    <button type="button" @click="resetDeckForm()">Cancel</button>
                 </form>
             </div>
 
             <!-- Card Management View -->
-            <div id="card-view" class="view hidden">
+            <div x-show="isViewActive('card')" class="view">
                 <div class="deck-header">
-                    <h2 id="current-deck-name">Deck Name</h2>
+                    <h2 x-text="currentDeck?.name || 'Deck Name'"></h2>
 
                     <!-- Review Options as Tiles -->
-                    <div id="review-tiles" class="review-tiles"></div>
+                    <div class="review-tiles">
+                        <div class="review-tile learning"
+                             :class="{ 'disabled': dueCounts.learning === 0 }"
+                             @click="dueCounts.learning > 0 && startReview('learning')">
+                            <h4>Learning Mode</h4>
+                            <p x-text="`${dueCounts.learning} cards due`"></p>
+                        </div>
+                        <div class="review-tile retention"
+                             :class="{ 'disabled': dueCounts.retaining === 0 }"
+                             @click="dueCounts.retaining > 0 && startReview('retaining')">
+                            <h4>Retention Mode</h4>
+                            <p x-text="`${dueCounts.retaining} cards due`"></p>
+                        </div>
+                        <div class="review-tile blitz"
+                             :class="{ 'disabled': cards.length === 0 }"
+                             @click="cards.length > 0 && startReview('blitz')">
+                            <h4>Blitz Mode</h4>
+                            <p x-text="`${cards.length} total cards`"></p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-management">
                     <div class="section-header">
                         <h3>Cards</h3>
-                        <button id="new-card-btn" class="btn-small">+ Add Card</button>
+                        <button @click="showNewCardForm()" class="btn-small">+ Add Card</button>
                     </div>
-                    <div id="card-list"></div>
+                    <div>
+                        <template x-if="cards.length === 0">
+                            <p class="empty-state">No cards yet. Add your first card!</p>
+                        </template>
+                        <template x-for="card in cards" :key="card.id">
+                            <div class="card-item">
+                                <h4 x-text="card.prompt"></h4>
+                                <p><strong>Response:</strong> <span x-text="card.response"></span></p>
+                                <p><small>Created: <span x-text="formatDate(card.created_at)"></span> | Mode: <span x-text="card.mode || 'learning'"></span> | <span x-text="getDueStatus(card)"></span></small></p>
+                                <div class="card-actions">
+                                    <button @click="editCard(card.id)">Edit</button>
+                                    <button @click="deleteCard(card.id)" class="delete-btn">Delete</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
 
             <!-- Card Creation/Edit Form -->
-            <div id="card-form-view" class="view hidden">
-                <h2 id="card-form-title">Add New Card</h2>
-                <form id="card-form">
-                <textarea id="card-prompt" placeholder="Prompt" required></textarea>
-                <textarea id="card-response" placeholder="Response" required></textarea>
-                <button type="submit" id="card-submit">Add Card</button>
-                <button type="button" id="cancel-card">Cancel</button>
+            <div x-show="isViewActive('card-form')" class="view">
+                <h2 x-text="cardForm.title"></h2>
+                <form @submit.prevent="createCard()">
+                    <textarea x-model="cardForm.prompt"
+                              placeholder="Prompt"
+                              required></textarea>
+                    <textarea x-model="cardForm.response"
+                              placeholder="Response"
+                              required></textarea>
+                    <button type="submit" x-text="cardForm.submitText"></button>
+                    <button type="button" @click="resetCardForm()">Cancel</button>
                 </form>
             </div>
 
             <!-- Review Session View -->
-            <div id="review-session-view" class="view hidden">
+            <div x-show="isViewActive('review-session')" class="view">
                 <div class="review-header">
-                    <div id="review-progress" class="review-progress"></div>
-                    <button onclick="exitSession()" class="exit-btn">Exit Session</button>
+                    <div class="review-progress" x-text="reviewProgress"></div>
+                    <button @click="exitSession()" class="exit-btn">Exit Session</button>
                 </div>
 
-                <div class="review-card">
+                <div class="review-card"
+                     :style="!reviewCard.showingAnswer ? 'cursor: pointer' : 'cursor: default'"
+                     @click="!reviewCard.showingAnswer && showAnswer()">
                     <div class="review-prompt">
-                        <p id="review-prompt-text"></p>
+                        <p x-text="reviewCard.prompt"></p>
                     </div>
 
-                    <div class="review-response" id="review-response">
-                        <p id="review-response-text"></p>
+                    <div class="review-response"
+                         :class="{ 'revealed': reviewCard.showingAnswer }">
+                        <p x-text="reviewCard.response"></p>
                     </div>
                 </div>
 
                 <div class="review-controls">
-                    <button id="show-answer-btn" onclick="showAnswer()">Show Answer</button>
+                    <button x-show="!reviewCard.showingAnswer"
+                            @click="showAnswer()">Show Answer</button>
 
-                    <div id="review-buttons" style="display: none;">
-                        <button onclick="answerIncorrect()" class="incorrect-btn">Incorrect</button>
-                        <button onclick="answerCorrect()" class="correct-btn">Correct</button>
+                    <div x-show="reviewCard.showingAnswer" style="display: flex; gap: var(--space-md);">
+                        <button @click="answerIncorrect()" class="incorrect-btn">Incorrect</button>
+                        <button @click="answerCorrect()" class="correct-btn">Correct</button>
                     </div>
                 </div>
             </div>
             </main>
         </div>
     </div>
-    <script type="module" src="script.js"></script>
+
 </body>
 </html>
